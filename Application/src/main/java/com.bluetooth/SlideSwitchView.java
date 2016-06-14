@@ -1,7 +1,5 @@
 package com.bluetooth;
 
-import com.example.baishihuitong.R;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +13,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.example.android.bluetoothlegatt.R;
 
 public class SlideSwitchView extends View{
 	/** Switch底部样式图片 */
@@ -72,7 +72,7 @@ public class SlideSwitchView extends View{
 	 * 初始化相关资源
 	 */
 	public void init() {
-		mSwitchThumbPressed = BitmapFactory.decodeResource(getResources(),R.drawable.checkswitch_btn_pressed);
+		mSwitchThumbPressed = BitmapFactory.decodeResource(getResources(), R.drawable.checkswitch_btn_pressed);
 		mSwitchThumbNormal = BitmapFactory.decodeResource(getResources(),R.drawable.checkswitch_btn_unpressed);
 		mSwitchBottom = BitmapFactory.decodeResource(getResources(),R.drawable.checkswitch_bottom);
 		mSwitchFrame = BitmapFactory.decodeResource(getResources(),R.drawable.checkswitch_frame);

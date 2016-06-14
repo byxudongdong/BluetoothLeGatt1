@@ -1,7 +1,7 @@
 package com.bluetooth;
 
 import com.bluetooth.SlideSwitchView.OnSwitchChangedListener;
-import com.example.baishihuitong.R;
+import com.example.android.bluetoothlegatt.R;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

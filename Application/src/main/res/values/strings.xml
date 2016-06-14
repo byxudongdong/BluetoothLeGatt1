@@ -33,4 +33,16 @@
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+
+
+    <string name="bluetooth_open">开启蓝牙</string>
+    <string name="connect_close">连接断开</string>
+    <string name="SERVICES_COVERED">服务已连接</string>
+    <string name="SERVICES_DISCOVERED">未找到该服务</string>
+    <string name="menu_disconnect_new">已连接，若要连接其他设备，请先断开连接</string>
+
+    <string name="bluetooth_scan_activity_dialog">正在连接服务，请稍后...</string>
+    <string name="bluetooth_scan_connect_w16">已配对的设备:</string>
+    <string name="bluetooth_scan_noconnect_w16">暂无设备连接</string>
+    <string name="bluetooth_scan_device">搜索设备</string>
 </resources>

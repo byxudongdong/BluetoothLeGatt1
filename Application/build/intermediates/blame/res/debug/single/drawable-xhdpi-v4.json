@@ -1,6 +1,26 @@
 [
     {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\checkswitch_btn_unpressed.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xhdpi\\checkswitch_btn_unpressed.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\checkswitch_bottom.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xhdpi\\checkswitch_bottom.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\checkswitch_btn_pressed.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xhdpi\\checkswitch_btn_pressed.png"
+    },
+    {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\ic_launcher.png",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\checkswitch_frame.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xhdpi\\checkswitch_frame.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\checkswitch_mask.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xhdpi\\checkswitch_mask.png"
     }
 ]

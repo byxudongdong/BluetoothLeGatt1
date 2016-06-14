@@ -45,10 +45,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.android.bluetoothlegatt.R;
+
 import java.util.ArrayList;
-
-import com.example.baishihuitong.R;
-
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.

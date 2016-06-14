@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="cardview_dark_background">#FF424242</color>
-    <color name="cardview_light_background">#FFFFFFFF</color>
-    <color name="cardview_shadow_end_color">#03000000</color>
-    <color name="cardview_shadow_start_color">#37000000</color>
-    <declare-styleable name="CardView"><attr format="color" name="cardBackgroundColor"/><attr format="dimension" name="cardCornerRadius"/><attr format="dimension" name="cardElevation"/><attr format="dimension" name="cardMaxElevation"/><attr format="boolean" name="cardUseCompatPadding"/><attr format="boolean" name="cardPreventCornerOverlap"/><attr format="dimension" name="contentPadding"/><attr format="dimension" name="contentPaddingLeft"/><attr format="dimension" name="contentPaddingRight"/><attr format="dimension" name="contentPaddingTop"/><attr format="dimension" name="contentPaddingBottom"/><attr name="android:minWidth"/><attr name="android:minHeight"/></declare-styleable>
-    <dimen name="cardview_compat_inset_shadow">1dp</dimen>
-    <dimen name="cardview_default_elevation">2dp</dimen>
-    <dimen name="cardview_default_radius">2dp</dimen>
+    <color name="background">#FF000000</color>
+    <color name="black">#FF000000</color>
+    <color name="bulegray">#f0f0f0</color>
+    <color name="divider_line">#FF575757</color>
+    <color name="font_focus">#D7F679</color>
+    <color name="gold">#ffd700</color>
+    <color name="gold_player">#F7F466</color>
+    <color name="gray">#828282</color>
+    <color name="graylight">#cccccc</color>
+    <color name="listview_item_normal">#eef0ed</color>
+    <color name="listview_item_pressed">#d4d4d4</color>
+    <color name="message_checked">#90918f</color>
+    <color name="message_no_check">#323232</color>
+    <color name="nearly_hard">#97000000</color>
+    <color name="orange">#FF6600</color>
+    <color name="orange_light">#fdaa0b</color>
+    <color name="pink_red">#F63E2A</color>
+    <color name="red">#FF0000</color>
+    <color name="semitransparent">#90000000</color>
+    <color name="stick_color_bg">#e2e2e2</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="whitetran">#87FFFFFF</color>
+    <color name="yellow">#FFFFE400</color>
     <dimen name="horizontal_page_margin">@dimen/margin_medium</dimen>
     <dimen name="margin_huge">64dp</dimen>
     <dimen name="margin_large">32dp</dimen>
@@ -15,8 +31,16 @@
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_tiny">4dp</dimen>
     <dimen name="vertical_page_margin">@dimen/margin_medium</dimen>
+    <string name="SERVICES_COVERED">服务已连接</string>
+    <string name="SERVICES_DISCOVERED">未找到该服务</string>
     <string name="app_name">BluetoothLeGatt</string>
     <string name="ble_not_supported">BLE is not supported</string>
+    <string name="bluetooth_open">开启蓝牙</string>
+    <string name="bluetooth_scan_activity_dialog">正在连接服务，请稍后...</string>
+    <string name="bluetooth_scan_connect_w16">已配对的设备:</string>
+    <string name="bluetooth_scan_device">搜索设备</string>
+    <string name="bluetooth_scan_noconnect_w16">暂无设备连接</string>
+    <string name="connect_close">连接断开</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
@@ -35,6 +59,7 @@
     <string name="label_state">State:</string>
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_disconnect_new">已连接，若要连接其他设备，请先断开连接</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
     <string name="no_data">No data</string>
@@ -43,21 +68,6 @@
     <string name="unknown_device">Unknown device</string>
     <string name="unknown_service">Unknown service</string>
     <style name="AppTheme" parent="Theme.Sample"/>
-    <style name="Base.CardView" parent="android:Widget">
-        <item name="cardCornerRadius">@dimen/cardview_default_radius</item>
-        <item name="cardElevation">@dimen/cardview_default_elevation</item>
-        <item name="cardMaxElevation">@dimen/cardview_default_elevation</item>
-        <item name="cardUseCompatPadding">false</item>
-        <item name="cardPreventCornerOverlap">true</item>
-    </style>
-    <style name="CardView" parent="Base.CardView">
-    </style>
-    <style name="CardView.Dark">
-        <item name="cardBackgroundColor">@color/cardview_dark_background</item>
-    </style>
-    <style name="CardView.Light">
-        <item name="cardBackgroundColor">@color/cardview_light_background</item>
-    </style>
     <style name="Theme.Base" parent="android:Theme.Light"/>
     <style name="Theme.Sample" parent="Theme.Base"/>
     <style name="Widget"/>

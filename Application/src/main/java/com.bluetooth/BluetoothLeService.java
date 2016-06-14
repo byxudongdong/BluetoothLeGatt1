@@ -19,14 +19,12 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.android.bluetoothlegatt.R;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-
-import com.example.baishihuitong.R;
-
 
 public class BluetoothLeService extends Service {
 	private final static String TAG = BluetoothLeService.class.getSimpleName();
@@ -140,7 +138,7 @@ public class BluetoothLeService extends Service {
 						mcharacteristic = mGattCharacteristics.get(i);
 						isFindService = true;
 						Util.DIALOG_VIEW_SHOE = true;
-						Log.d("WRITE_DEVICE_UUID<<<<<<<<<<", "发现service");
+						Log.d("WRITE_DEVICE_UUID<<<<<<", "发现service");
 //						sendPowerCharacteristicWrite();
 					}
 
@@ -256,7 +254,7 @@ public class BluetoothLeService extends Service {
 	int i = 0;
 	public void broadcastUpdate(final String action,
 			final BluetoothGattCharacteristic characteristic) {
-		Log.d("@@@@@@@@@@@@@@@@@@@@@@",
+		Log.d("@@@@@@@@@@@@@@@@",
 				stringBuilder.toString());
 		
 		final Intent intent = new Intent(action);
@@ -269,7 +267,7 @@ public class BluetoothLeService extends Service {
 		
 			if (stringBuilder.toString().startsWith("40 03 52 0D")) {	
 				power_intent.putExtra(EXTRA_DATA, "");
-				Log.d("sendBroadcast power_intent", stringBuilder.toString());
+				Log.d("发送广播power_intent", stringBuilder.toString());
 				String current = getPowerNumberString(stringBuilder.toString());
 				power_intent.putExtra(EXTRA_DATA,current);
 				sendBroadcast(power_intent);

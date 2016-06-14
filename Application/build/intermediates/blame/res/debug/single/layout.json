@@ -8,6 +8,14 @@
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\listitem_device.xml"
     },
     {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\bluetooth_search_activity.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\bluetooth_search_activity.xml"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\bluetooth_scan_activity.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\bluetooth_scan_activity.xml"
+    },
+    {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\gatt_services_characteristics.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\gatt_services_characteristics.xml"
     }
