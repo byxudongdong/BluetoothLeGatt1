@@ -54,22 +54,22 @@ public class DeviceControlActivity extends Activity {
 
     private TextView mConnectionState;
     private TextView mDataField;
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private ExpandableListView mGattServicesList;
-    private BluetoothLeService mBluetoothLeService;
-    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
+    public static String mDeviceName;
+    public static String mDeviceAddress;
+    public static ExpandableListView mGattServicesList;
+    public static BluetoothLeService mBluetoothLeService;
+    public static ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-    private boolean mConnected = false;
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
+    public static boolean mConnected = false;
+    public static BluetoothGattCharacteristic mNotifyCharacteristic;
 
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
 
-    List<BluetoothGattService> mnotyGattService;
-    BluetoothGattCharacteristic characteristic;
-    List<BluetoothGattService> readMnotyGattService;
-    BluetoothGattCharacteristic readCharacteristic;
+    public static BluetoothGattService mnotyGattService;
+    public static BluetoothGattCharacteristic writecharacteristic;
+    public static BluetoothGattService readMnotyGattService;
+    public static BluetoothGattCharacteristic readCharacteristic;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -118,20 +118,33 @@ public class DeviceControlActivity extends Activity {
                 // Show all the supported services and characteristics on the user interface.
                 Log.i("发现服务","打印服务列表");
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
-//                //写数据的服务和characteristic
-//                mnotyGattService = mBluetoothLeService.getSupportedGattServices(UUID.fromString("0000ffe5-0000-1000-8000-00805f9b34fb"));
-//                characteristic = mnotyGattService.getCharacteristic(UUID.fromString("0000ffe9-0000-1000-8000-00805f9b34fb"));
+               //写数据的服务和characteristic
+                mnotyGattService = mBluetoothLeService.getSupportedGattService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
+                writecharacteristic = mnotyGattService.getCharacteristic(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
+//                byte[] bytes = {0x33,0x34,0x36,0x34,0x39};
+//                Boolean bool = writecharacteristic.setValue(bytes);
+//                BluetoothLeService.writeCharacteristic( writecharacteristic);
+//                if(bool) {
+//                    PrintLog.printHexString("写特征值：", writecharacteristic.getValue());
+//                }else{
+//                    Log.i("写特征值：", "写失败");
+//                }
 //                //读数据的服务和characteristic
-//                readMnotyGattService = mBluetoothLeService.getSupportedGattServices(UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb"));
-//                readCharacteristic = readMnotyGattService.getCharacteristic(UUID.fromString("0000ffe4-0000-1000-8000-00805f9b34fb"));
+               //readMnotyGattService = mBluetoothLeService.getSupportedGattService(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"));
+               // readCharacteristic = readMnotyGattService.getCharacteristic(UUID.fromString("0000ffe4-0000-1000-8000-00805f9b34fb"));
             }
             //显示数据
             else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 //将数据显示在mDataField上
-                Log.i("显示数据","将数据显示在mDataField上");
+                //Log.i("显示接受数据","将接受数据显示在mDataField上");
                 String data = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                System.out.println("data----" + data);
+                //System.out.println("接收到data----" + data);
                 displayData(data);
+            }
+
+            else if(BluetoothLeService.EXTRA_DATA.equals(action))
+            {
+                Log.i("显示EXTRA_DATA","EXTRA_DATA");
             }
         }
     };
@@ -157,19 +170,20 @@ public class DeviceControlActivity extends Activity {
                                         mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
                             }
-                            mBluetoothLeService.readCharacteristic(characteristic);
-                            Log.i("BLE读数据",characteristic.toString());
+                            writecharacteristic.setValue("0123456789");
+                            mBluetoothLeService.readCharacteristic(writecharacteristic);
+                            //Log.i("BLE读数据",characteristic.getStringValue(0));
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(
                                     characteristic, true);
-                            Log.i("BLE通知",characteristic.toString());
+                            Log.i("BLE通知",characteristic.getStringValue(0));
                         }
                         if((charaProp | BluetoothGattCharacteristic.PROPERTY_WRITE)>0){
-                            characteristic.setValue("0123456789");
-                            mBluetoothLeService.writeCharacteristic(characteristic);
-                            Log.i("BLE写数据",characteristic.toString());
+                            //mBluetoothLeService.writeCharacteristic(characteristic);
+                            mBluetoothLeService.writeCharacteristic(writecharacteristic);
+                            //Log.i("BLE写数据",writecharacteristic.getStringValue(0));
                         }
                         return true;
                     }
@@ -276,7 +290,7 @@ public class DeviceControlActivity extends Activity {
     // on the UI.
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
-        String uuid = null;
+        String uuid;
         String unknownServiceString = getResources().getString(R.string.unknown_service);
         String unknownCharaString = getResources().getString(R.string.unknown_characteristic);
         ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
@@ -313,19 +327,23 @@ public class DeviceControlActivity extends Activity {
             mGattCharacteristics.add(charas);
             gattCharacteristicData.add(gattCharacteristicGroupData);
         }
-
+        /*
+            生成嵌套列表
+         */
         SimpleExpandableListAdapter gattServiceAdapter = new SimpleExpandableListAdapter(
                 this,
                 gattServiceData,
-                android.R.layout.simple_expandable_list_item_2,
+                R.layout.listitemidex_device,
                 new String[] {LIST_NAME, LIST_UUID},
                 new int[] { android.R.id.text1, android.R.id.text2 },
                 gattCharacteristicData,
-                android.R.layout.simple_expandable_list_item_2,
+                R.layout.listitemchild_device,
                 new String[] {LIST_NAME, LIST_UUID},
                 new int[] { android.R.id.text1, android.R.id.text2 }
         );
+        Log.i("重设列表","设置Adapter");
         mGattServicesList.setAdapter(gattServiceAdapter);
+
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
