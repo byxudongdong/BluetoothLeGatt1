@@ -26,14 +26,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +54,14 @@ import java.util.UUID;
  */
 public class DeviceControlActivity extends Activity {
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
+
+    public static Object object = new Object();
+    Thread mthread;
+    Boolean updateFlag = false;
+    int updateIdex;
+    String newtime;
+    public Button upDateButton;
+    public EditText updateState;
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
@@ -140,6 +154,9 @@ public class DeviceControlActivity extends Activity {
                 String data = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 //System.out.println("接收到data----" + data);
                 displayData(data);
+                Message message = new Message();
+                message.what = 1;
+                handler.sendMessage(message);
             }
 
             else if(BluetoothLeService.EXTRA_DATA.equals(action))
@@ -209,14 +226,109 @@ public class DeviceControlActivity extends Activity {
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
         mGattServicesList.setOnChildClickListener(servicesListClickListner);
+        mGattServicesList.setVisibility(View.GONE);
+
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
+
+        upDateButton = (Button)findViewById(R.id.updateButton);
+        updateState = (EditText) findViewById(R.id.updateState);
 
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
+        upDateButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Log.i("开始升级", "button onClick");
+                upDateButton.setClickable(false);
+                updateFlag = true;
+                mthread =new Thread(sendData );
+                mthread.start();
+            }
+        });
     }
+
+    Runnable sendData = new Runnable()
+    {
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            Time t=new Time(); // or Time t=new Time("GMT+8"); 加上Time Zone资料。
+            t.setToNow(); // 取得系统时间。
+            int year = t.year;
+            int month = t.month + 1;
+            int date = t.monthDay;
+//    		int hour = t.hour; // 0-23
+//    		int minute = t.minute;
+//    		int second = t.second;
+
+            newtime = String.valueOf(year)
+                    +"-"+String.format("%02d",month)
+                    +"-"+String.format("%02d",date);
+            while(updateFlag) {
+                byte[] bytes = {0x33, 0x34, 0x36, 0x34, 0x39};
+                Boolean bool = writecharacteristic.setValue(bytes);
+                if (bool) {
+                    Log.i("写特征值：", "本地写成功");
+                    BluetoothLeService.writeCharacteristic(writecharacteristic);
+                } else {
+                    Log.i("写特征值：", "本地写失败");
+                }
+
+                synchronized(object)
+                {
+                    try {
+                        Log.i("加锁等待：", "wait...");
+                        object.wait(); // 暂停线程
+                    }catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                updateFlag = false;
+            }
+
+            Message message = new Message();
+            message.what = 0;
+            handler.sendMessage(message);
+
+            Log.i("使能按键：", "wait...");
+            upDateButton.setClickable(true);
+        }
+    };
+
+    final Handler handler=new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            switch(msg.what){
+                case 0:
+                    Toast.makeText(getApplicationContext(), "升级成功！！！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 1:
+                    //Toast.makeText(getApplicationContext(), "收到回应", Toast.LENGTH_SHORT).show();
+                    updateState.setText("收到回应");
+
+                    synchronized(object)
+                    {
+                        Log.i("解锁通知：", "wait...");
+                        object.notify(); // 恢复线程
+                    }
+
+                    break;
+                case 2:
+                    break;
+            }
+        }
+    };
+
 
     @Override
     protected void onResume() {
