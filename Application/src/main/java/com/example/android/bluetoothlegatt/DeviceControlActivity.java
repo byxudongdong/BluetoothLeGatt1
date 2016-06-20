@@ -321,7 +321,7 @@ public class DeviceControlActivity extends Activity {
                 //发送唤醒
                 if(update_step == 0)
                 {
-                    UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
+                    //UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
                     try{
                         Thread.sleep(50);
                     }catch( InterruptedException e){
@@ -558,6 +558,7 @@ public class DeviceControlActivity extends Activity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BluetoothLeService.WRITE_STATUS);
         return intentFilter;
     }
 
