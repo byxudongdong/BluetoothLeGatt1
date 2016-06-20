@@ -63,6 +63,9 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
 
+    public final static String WRITE_STATUS =
+            "com.example.bluetooth.le.WRITE_STATUS";
+
     public final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
 
@@ -72,6 +75,7 @@ public class BluetoothLeService extends Service {
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
+    Boolean WriteCharacterRspFlag = false;
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -154,6 +158,16 @@ public class BluetoothLeService extends Service {
                                             BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
         }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt,
+                                          BluetoothGattCharacteristic characteristic, int status) {
+            //得到写回应，在这里显示写结果
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                broadcastUpdate(WRITE_STATUS, characteristic);
+                WriteCharacterRspFlag = true;
+            }
+        }
     };
 
     private void broadcastUpdate(final String action) {
@@ -196,7 +210,8 @@ public class BluetoothLeService extends Service {
                     //以十六进制的形式输出
                     stringBuilder.append(String.format("%02X ", byteChar));
                 // intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
-                intent.putExtra(EXTRA_DATA, new String(data));
+               // intent.putExtra(EXTRA_DATA, new String(data));
+                intent.putExtra(EXTRA_DATA, data);
             }
         }
         sendBroadcast(intent);
@@ -333,13 +348,14 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.readCharacteristic(characteristic);
     }
 
-    public static void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public static Boolean writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w("Write", "BluetoothAdapter not initialized");
-            return;
+            return false;
         }
-        Log.i("Gatt写数据",characteristic.getStringValue(0));
-        mBluetoothGatt.writeCharacteristic(characteristic);
+        //Log.i("Gatt写数据",characteristic.getStringValue(0));
+        PrintLog.printHexString("Gatt写数据",characteristic.getValue());
+        return mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
     /**

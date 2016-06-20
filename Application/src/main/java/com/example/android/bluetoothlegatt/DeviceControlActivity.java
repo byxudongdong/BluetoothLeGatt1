@@ -41,6 +41,8 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +60,6 @@ public class DeviceControlActivity extends Activity {
     public static Object object = new Object();
     Thread mthread;
     Boolean updateFlag = false;
-    int updateIdex;
     String newtime;
     public Button upDateButton;
     public EditText updateState;
@@ -131,7 +132,7 @@ public class DeviceControlActivity extends Activity {
             else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 Log.i("发现服务","打印服务列表");
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+                //displayGattServices(mBluetoothLeService.getSupportedGattServices());
                //写数据的服务和characteristic
                 mnotyGattService = mBluetoothLeService.getSupportedGattService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
                 writecharacteristic = mnotyGattService.getCharacteristic(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
@@ -151,9 +152,10 @@ public class DeviceControlActivity extends Activity {
             else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 //将数据显示在mDataField上
                 //Log.i("显示接受数据","将接受数据显示在mDataField上");
-                String data = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
+                byte[] data = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 //System.out.println("接收到data----" + data);
-                displayData(data);
+                PrintLog.printHexString("接收到data----",data);
+                displayData(PrintLog.returnHexString(data));
                 Message message = new Message();
                 message.what = 1;
                 handler.sendMessage(message);
@@ -162,6 +164,11 @@ public class DeviceControlActivity extends Activity {
             else if(BluetoothLeService.EXTRA_DATA.equals(action))
             {
                 Log.i("显示EXTRA_DATA","EXTRA_DATA");
+            }
+            else if(BluetoothLeService.WRITE_STATUS.equals(action))
+            {
+                WriteCharacterRspFlag = true;
+                Log.i("写数据结果","回应成功");
             }
         }
     };
@@ -253,6 +260,20 @@ public class DeviceControlActivity extends Activity {
         });
     }
 
+    public final int UpdateStepSendRequst = 0,
+                    UpdateStepWaitRequestRes = 1,
+                    UpdateStepSendImage = 2,
+                    UpdateStepWaitImageRes = 3,
+                    UpdateStepWaitCRCRes = 4,
+                    UpdateStepCRCResRecv = 5;
+    public int sendLen=0,filedataLen=0,updateIdex= 0,update_step = UpdateStepSendRequst;
+    public long startTime=0,consumingTime=0;  //開始時間
+    FileInputStream fin = null;
+    byte [] buffer = null;
+    String fileName = "classes.dex";
+    Boolean receiveDataFlag = false;
+    public static Boolean WriteCharacterRspFlag = false;
+
     Runnable sendData = new Runnable()
     {
         @Override
@@ -263,44 +284,115 @@ public class DeviceControlActivity extends Activity {
             int year = t.year;
             int month = t.month + 1;
             int date = t.monthDay;
+
 //    		int hour = t.hour; // 0-23
 //    		int minute = t.minute;
 //    		int second = t.second;
-
             newtime = String.valueOf(year)
                     +"-"+String.format("%02d",month)
                     +"-"+String.format("%02d",date);
-            while(updateFlag) {
-                byte[] bytes = {0x33, 0x34, 0x36, 0x34, 0x39};
-                Boolean bool = writecharacteristic.setValue(bytes);
-                if (bool) {
-                    Log.i("写特征值：", "本地写成功");
-                    BluetoothLeService.writeCharacteristic(writecharacteristic);
-                } else {
-                    Log.i("写特征值：", "本地写失败");
-                }
 
-                synchronized(object)
+            //读SD中的文件
+
+            try{
+                String filePath = UpdateOpt.getSdCardPath() + "/classes.dex";
+                fin = new FileInputStream(filePath);
+                filedataLen = fin.available();
+                buffer = new byte[98];
+
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            while(updateFlag)
+            {
+                byte[] bytes = UpdateOpt.wakeupData;        //写入发送数据
+//                Boolean bool = UpdateOpt.WriteComm( writecharacteristic, bytes, bytes.length);
+//
+//                synchronized(object)
+//                {
+//                    try {
+//                        //Log.i("加锁等待：", "wait...");
+//                        object.wait(); // 暂停线程
+//                    }catch(InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+                //发送唤醒
+                if(update_step == 0)
                 {
-                    try {
-                        Log.i("加锁等待：", "wait...");
-                        object.wait(); // 暂停线程
-                    }catch(InterruptedException e) {
-                        e.printStackTrace();
+                    UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
+                    try{
+                        Thread.sleep(50);
+                    }catch( InterruptedException e){
+                        Log.i("等待延时：", "wait...");
                     }
+                }
+                update_step = update_Switch();
+                try {
+                    sendLen = fin.read(buffer,updateIdex * 98 ,98);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(sendLen > 0)
+                {
+                    UpdateOpt.WriteComm(writecharacteristic, buffer, sendLen);
+                }
+                if(update_step == 5)
+                {
+                    //升级完成后
+                    updateFlag = false;
+                    break;
                 }
 
                 updateFlag = false;
             }
 
+            try {
+                fin.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Message message = new Message();
             message.what = 0;
             handler.sendMessage(message);
 
-            Log.i("使能按键：", "wait...");
+            //Log.i("使能按键：", "wait...");
             upDateButton.setClickable(true);
         }
     };
+
+    public int update_Switch()
+    {
+        int res = -1;
+        startTime = System.currentTimeMillis();  //開始時間
+
+        switch (update_step)
+        {
+            case UpdateStepSendRequst:
+                //发送升级请求
+                sendMessage( 2 );
+
+                break;
+            case UpdateStepSendImage:
+                sendMessage( 3 );
+                break;
+            case UpdateStepWaitRequestRes:
+
+                break;
+            case UpdateStepWaitImageRes:
+
+                break;
+            case UpdateStepWaitCRCRes:
+
+                break;
+            case UpdateStepCRCResRecv:
+
+                break;
+        }
+
+        return res;
+    }
 
     final Handler handler=new Handler()
     {
@@ -314,6 +406,7 @@ public class DeviceControlActivity extends Activity {
                     break;
                 case 1:
                     //Toast.makeText(getApplicationContext(), "收到回应", Toast.LENGTH_SHORT).show();
+                    receiveDataFlag = true;
                     updateState.setText("收到回应");
 
                     synchronized(object)
@@ -324,6 +417,7 @@ public class DeviceControlActivity extends Activity {
 
                     break;
                 case 2:
+                    updateState.setText("发送升级请求");
                     break;
             }
         }
@@ -465,5 +559,29 @@ public class DeviceControlActivity extends Activity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
         return intentFilter;
+    }
+
+    //读SD中的文件
+    public static byte[] readFileSdcardFile(String fileName) throws IOException{
+        String res="";
+        byte [] buffer = null;
+        try{
+            FileInputStream fin = new FileInputStream(UpdateOpt.getSdCardPath() + fileName);
+            int length = fin.available();
+            buffer = new byte[length];
+            fin.read(buffer);
+            //res = EncodingUtils.getString(buffer, "UTF-8");
+            fin.close();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        return buffer;
+    }
+
+    public void sendMessage(int what)
+    {
+        Message message = new Message();
+        message.what = what;
+        handler.sendMessage(message);
     }
 }
