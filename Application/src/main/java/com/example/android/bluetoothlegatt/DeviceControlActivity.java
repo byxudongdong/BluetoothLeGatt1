@@ -214,6 +214,7 @@ public class DeviceControlActivity extends Activity {
                     return false;
                 }
     };
+    private int update_sendSize;
 
     private void clearUI() {
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
@@ -307,7 +308,7 @@ public class DeviceControlActivity extends Activity {
             while(updateFlag)
             {
                 byte[] bytes = UpdateOpt.wakeupData;        //写入发送数据
-//                Boolean bool = UpdateOpt.WriteComm( writecharacteristic, bytes, bytes.length);
+                Boolean bool = UpdateOpt.WriteComm( writecharacteristic, bytes, bytes.length);
 //
 //                synchronized(object)
 //                {
@@ -321,7 +322,7 @@ public class DeviceControlActivity extends Activity {
                 //发送唤醒
                 if(update_step == 0)
                 {
-                    //UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
+                    UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
                     try{
                         Thread.sleep(50);
                     }catch( InterruptedException e){
@@ -372,7 +373,10 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepSendRequst:
                 //发送升级请求
                 sendMessage( 2 );
-
+                update_sendUpdateReq();
+                //update_sendSize = 0;
+                update_step++;
+                consumingTime = startTime;
                 break;
             case UpdateStepSendImage:
                 sendMessage( 3 );
@@ -584,5 +588,35 @@ public class DeviceControlActivity extends Activity {
         Message message = new Message();
         message.what = what;
         handler.sendMessage(message);
+    }
+
+    void update_sendUpdateReq()
+    {
+        byte temp[] = new byte[32];
+        int requestId;
+        int len;
+
+        //supportCipher = false;
+
+	/* 已发送数据大小 */
+        update_sendSize = 0;
+
+        len = 0;
+        //发送升级请求，并等待回应
+        //requestId = UPDATE_REQUEST_ID;
+        //memcpy(&temp[len], &requestId, 2);
+        temp[len] = (byte)0xFD;
+        temp[len+1] = (byte)0xFF;
+        len += 2;
+        //memcpy(&temp[len], &tUpdate_info.hw_info, 4);
+        len += 4;
+        //memcpy(&temp[len], &tUpdate_info.image_size, 4);
+        len += 4;
+        //memcpy(&temp[len], &tUpdate_info.image_crc, 4);
+        len += 4;
+
+        //comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, &temp[1], len-1);//只为唤醒目标机
+        //Delay(50);
+        //comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, temp, len);
     }
 }
