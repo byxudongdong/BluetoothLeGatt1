@@ -136,24 +136,13 @@ public class DeviceControlActivity extends Activity {
                //写数据的服务和characteristic
                 mnotyGattService = mBluetoothLeService.getSupportedGattService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
                 writecharacteristic = mnotyGattService.getCharacteristic(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
-//                byte[] bytes = {0x33,0x34,0x36,0x34,0x39};
-//                Boolean bool = writecharacteristic.setValue(bytes);
-//                BluetoothLeService.writeCharacteristic( writecharacteristic);
-//                if(bool) {
-//                    PrintLog.printHexString("写特征值：", writecharacteristic.getValue());
-//                }else{
-//                    Log.i("写特征值：", "写失败");
-//                }
-//                //读数据的服务和characteristic
-               //readMnotyGattService = mBluetoothLeService.getSupportedGattService(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"));
-               // readCharacteristic = readMnotyGattService.getCharacteristic(UUID.fromString("0000ffe4-0000-1000-8000-00805f9b34fb"));
             }
             //显示数据
             else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 //将数据显示在mDataField上
                 //Log.i("显示接受数据","将接受数据显示在mDataField上");
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                //System.out.println("接收到data----" + data);
+                receiveDataFlag = true;
                 PrintLog.printHexString("接收到data----",data);
                 displayData(PrintLog.returnHexString(data));
                 Message message = new Message();
@@ -308,7 +297,7 @@ public class DeviceControlActivity extends Activity {
             while(updateFlag)
             {
                 byte[] bytes = UpdateOpt.wakeupData;        //写入发送数据
-                Boolean bool = UpdateOpt.WriteComm( writecharacteristic, bytes, bytes.length);
+                //Boolean bool = UpdateOpt.WriteComm( writecharacteristic, bytes, bytes.length);
 //
 //                synchronized(object)
 //                {
@@ -322,6 +311,7 @@ public class DeviceControlActivity extends Activity {
                 //发送唤醒
                 if(update_step == 0)
                 {
+                    Log.i("唤醒蓝牙：", "wait...");
                     UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
                     try{
                         Thread.sleep(50);
@@ -329,6 +319,7 @@ public class DeviceControlActivity extends Activity {
                         Log.i("等待延时：", "wait...");
                     }
                 }
+                Log.i("升级流程切换：", "wait...");
                 update_step = update_Switch();
                 try {
                     sendLen = fin.read(buffer,updateIdex * 98 ,98);
@@ -337,12 +328,16 @@ public class DeviceControlActivity extends Activity {
                 }
                 if(sendLen > 0)
                 {
+                    Log.i("发送文件数据：", "wait...");
                     UpdateOpt.WriteComm(writecharacteristic, buffer, sendLen);
                 }
                 if(update_step == 5)
                 {
                     //升级完成后
                     updateFlag = false;
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
                     break;
                 }
 
@@ -354,32 +349,44 @@ public class DeviceControlActivity extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Message message = new Message();
-            message.what = 0;
-            handler.sendMessage(message);
 
-            //Log.i("使能按键：", "wait...");
+            Log.i("使能按键：", "wait...");
+            update_step = 0;
             upDateButton.setClickable(true);
         }
     };
 
     public int update_Switch()
     {
-        int res = -1;
         startTime = System.currentTimeMillis();  //開始時間
 
         switch (update_step)
         {
             case UpdateStepSendRequst:
                 //发送升级请求
+                Log.i("发送升级请求：", "wait...");
                 sendMessage( 2 );
-                update_sendUpdateReq();
+                receiveDataFlag = false;
+                while(!receiveDataFlag)
+                {
+                    update_sendUpdateReq();
+                    try {
+                        Thread.currentThread().sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 //update_sendSize = 0;
                 update_step++;
                 consumingTime = startTime;
                 break;
             case UpdateStepSendImage:
+                Log.i("发送升级文件：", "wait...");
                 sendMessage( 3 );
+                /* 发送升级数据 */
+                //update_sendLen = update_sendImageData();
+                consumingTime = startTime;
+                update_step++;
                 break;
             case UpdateStepWaitRequestRes:
 
@@ -395,7 +402,7 @@ public class DeviceControlActivity extends Activity {
                 break;
         }
 
-        return res;
+        return update_step;
     }
 
     final Handler handler=new Handler()
@@ -406,11 +413,12 @@ public class DeviceControlActivity extends Activity {
 
             switch(msg.what){
                 case 0:
+                    update_step = 0;
                     Toast.makeText(getApplicationContext(), "升级成功！！！", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
                     //Toast.makeText(getApplicationContext(), "收到回应", Toast.LENGTH_SHORT).show();
-                    receiveDataFlag = true;
+                    //receiveDataFlag = true;
                     updateState.setText("收到回应");
 
                     synchronized(object)
@@ -609,14 +617,100 @@ public class DeviceControlActivity extends Activity {
         temp[len+1] = (byte)0xFF;
         len += 2;
         //memcpy(&temp[len], &tUpdate_info.hw_info, 4);
+        temp[len] = (byte)0x01;
+        temp[len+1] = (byte)0x00;
+        temp[len+2] = (byte)0x01;
+        temp[len+3] = (byte)0x00;
         len += 4;
         //memcpy(&temp[len], &tUpdate_info.image_size, 4);
+        temp[len] = (byte)0x00;
+        temp[len+1] = (byte)0x80;
+        temp[len+2] = (byte)0x00;
+        temp[len+3] = (byte)0x00;
         len += 4;
         //memcpy(&temp[len], &tUpdate_info.image_crc, 4);
+        temp[len] = (byte)0x12;
+        temp[len+1] = (byte)0x34;
+        temp[len+2] = (byte)0x56;
+        temp[len+3] = (byte)0x78;
         len += 4;
 
         //comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, &temp[1], len-1);//只为唤醒目标机
         //Delay(50);
-        //comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, temp, len);
+        comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, temp, len);
+    }
+
+
+/* 封包起始和结尾字节 */
+    byte    COMM_PAKET_START_BYTE    = 0x40;
+    byte    COMM_PAKET_END_BYTE		=(byte)	(0x2A);
+    byte    COMM_PAKET1_END_BYTE		=(byte)	(0xA2);
+/* 收发类型 */
+    byte	COMM_TRANS_TYPE_SEND		=	(0x53);	/* 'S'---send */
+    byte	COMM_TRANS_TYPE_RESP		=	(0x52);	/* 'R'---response */
+/* 命令类型 */
+    byte	COMM_CMD_TYPE_BARCODE		=	(0x01);	//条码传输
+    byte	COMM_CMD_TYPE_BUTTON		=	(0x02);	//滑动按键，保留
+    byte	COMM_CMD_TYPE_RESEVE0		=	(0x03);	//保留
+    byte	COMM_CMD_TYPE_LED			=	(0x04);	//控制led(Simple)
+    byte	COMM_CMD_TYPE_LED_ADV		=	(0x05);	//控制led(Advanced)
+    byte	COMM_CMD_TYPE_BT_NAME		=	(0x06);	//蓝牙名称设置
+    byte	COMM_CMD_TYPE_SUFFIX		=	(0x07);	//条码后缀设置
+//byte	COMM_CMD_TYPE_BAR_PRIOR		=	(0x08);	//条码解码优先级设置
+//byte	COMM_CMD_TYPE_BAR_PARAM		=	(0x09);	//条码解码参数设置
+    byte	COMM_CMD_TYPE_BT_STA	=		(0x0A);	//BT连接状态报告
+    byte	COMM_CMD_TYPE_BAT_LEV		=	(0x0A);	//电量获取
+    byte	COMM_CMD_TYPE_CONNECT_STA	=	(0x0B);	//连接状态查询
+    byte	COMM_CMD_TYPE_RSSI		    =    (0x0C);	//获取本地蓝牙的RSSI
+    byte	COMM_CMD_TYPE_SCAN_MODE		=	(0x0E);	//扫描模式设置
+    byte	COMM_CMD_TYPE_RD_BAR_PRIOR	=	(0x10);	//读取条码解码优先级
+    byte	COMM_CMD_TYPE_WR_BAR_PRIOR	=	(0x11);	//设置条码解码优先级
+    byte	COMM_CMD_TYPE_RD_BAR_PARAM	=	(0x12);	//读取条码解码参数
+    byte	COMM_CMD_TYPE_WR_BAR_PARAM	=	(0x13);	//设置条码解码参数
+    byte   COMM_CMD_TYPE_DEBUG_EN		=(byte)	(0xB0);	//debug开关
+    byte   COMM_CMD_TYPE_DEBUG_SCAN	    =(byte)	(0xB1);	//debug scan开关
+    byte	COMM_CMD_TYPE_WR_STAY_COMM   =(byte)	(0xC0);	//座充保持COMM模式
+    byte	COMM_CMD_TYPE_WR_IN_USB		=(byte)	(0xC1);	//座充进入U盘模式
+    byte	COMM_CMD_TYPE_UPDATE		=(byte)	(0xD0);	//软件升级
+    byte	COMM_CMD_TYPE_VOICE		=(byte)	(0xD1);	//语音数据传输
+    byte	COMM_CMD_TYPE_DONGLE_SN	=(byte)	(0xD2);	//dongle序列号z
+    byte	COMM_CMD_TYPE_TOUCH		=	(byte)0xDF;	//touch数据
+    byte	COMM_CMD_TYPE_VERSION		=	(byte)(0xE0);	//R11版本信息
+/* 封包最小长度 */
+    int	    COMM_PAKET_LEN_MIN	=	(6);
+    int 	COMM_DATA_BUF_LEN	    =	(1024);
+
+    /*-------------------------------------------------------------------------
+* 函数: comm_send
+* 说明: 发送
+* 参数: pData---数据buffer
+		len-----条码长度
+* 返回: HY_OK------发送成功
+		HY_ERROR---发送失败
+-------------------------------------------------------------------------*/
+    Boolean comm_send(byte transType, byte cmd, byte[] pData, int len)
+    {
+        byte i;
+        byte[] temp = new byte[len + 6];
+        int sum=0;
+
+        if (pData==null) return false;
+
+        temp[0] = COMM_PAKET_START_BYTE;
+        temp[1] = (byte)(len+2);
+        temp[2] = (byte)transType;
+        temp[3] = (byte)cmd;
+        //memcpy(&temp[4], pData, len);
+        System.arraycopy(pData,0,temp,4,len);
+        temp[len+5] = COMM_PAKET_END_BYTE;
+        for(i=0; i<len+3; i++)
+        {
+            sum += temp[i+1];
+        }
+        temp[len+4] = (byte)sum;
+        //Log.i("调用特征值写：", "wait...");
+        UpdateOpt.WriteComm(writecharacteristic,temp, len+6);
+
+        return true;
     }
 }
