@@ -354,7 +354,7 @@ public class BluetoothLeService extends Service {
             return false;
         }
         //Log.i("Gatt写数据",characteristic.getStringValue(0));
-        PrintLog.printHexString("Gatt写数据",characteristic.getValue());
+        //PrintLog.printHexString("Gatt写数据",characteristic.getValue());
         return mBluetoothGatt.writeCharacteristic(characteristic);
     }
 

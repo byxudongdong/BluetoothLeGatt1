@@ -57,6 +57,10 @@ import java.util.UUID;
 public class DeviceControlActivity extends Activity {
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
 
+    public static Boolean receiveDataFlag = false;
+    public static Boolean WriteCharacterRspFlag = false;
+
+    UpdateOpt updateOpt = new UpdateOpt();
     public static Object object = new Object();
     Thread mthread;
     Boolean updateFlag = false;
@@ -143,7 +147,7 @@ public class DeviceControlActivity extends Activity {
                 //Log.i("显示接受数据","将接受数据显示在mDataField上");
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 receiveDataFlag = true;
-                PrintLog.printHexString("接收到data----",data);
+                PrintLog.printHexString("接收到data*****",data);
                 displayData(PrintLog.returnHexString(data));
                 Message message = new Message();
                 message.what = 1;
@@ -241,11 +245,18 @@ public class DeviceControlActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Log.i("开始升级", "button onClick");
-                upDateButton.setClickable(false);
-                updateFlag = true;
-                mthread =new Thread(sendData );
-                mthread.start();
+                if(mConnected)
+                {
+                    Log.i("开始升级", "button onClick");
+                    upDateButton.setClickable(false);
+                    updateFlag = true;
+                    mthread = new Thread(sendData, "Update");
+                    mthread.start();
+                }
+                else
+                {
+                    Log.i("蓝牙连接状态", "蓝牙断开");
+                }
             }
         });
     }
@@ -261,8 +272,7 @@ public class DeviceControlActivity extends Activity {
     FileInputStream fin = null;
     byte [] buffer = null;
     String fileName = "classes.dex";
-    Boolean receiveDataFlag = false;
-    public static Boolean WriteCharacterRspFlag = false;
+
 
     Runnable sendData = new Runnable()
     {
@@ -285,7 +295,7 @@ public class DeviceControlActivity extends Activity {
             //读SD中的文件
 
             try{
-                String filePath = UpdateOpt.getSdCardPath() + "/classes.dex";
+                String filePath = updateOpt.getSdCardPath() + "/classes.dex";
                 fin = new FileInputStream(filePath);
                 filedataLen = fin.available();
                 buffer = new byte[98];
@@ -296,8 +306,8 @@ public class DeviceControlActivity extends Activity {
 
             while(updateFlag)
             {
-                byte[] bytes = UpdateOpt.wakeupData;        //写入发送数据
-                //Boolean bool = UpdateOpt.WriteComm( writecharacteristic, bytes, bytes.length);
+                byte[] bytes = updateOpt.wakeupData;        //写入发送数据
+                //Boolean bool = WriteComm( writecharacteristic, bytes, bytes.length);
 //
 //                synchronized(object)
 //                {
@@ -312,7 +322,7 @@ public class DeviceControlActivity extends Activity {
                 if(update_step == 0)
                 {
                     Log.i("唤醒蓝牙：", "wait...");
-                    UpdateOpt.WriteComm(writecharacteristic, bytes, bytes.length);
+                    WriteComm(writecharacteristic, bytes, bytes.length);
                     try{
                         Thread.sleep(50);
                     }catch( InterruptedException e){
@@ -321,6 +331,7 @@ public class DeviceControlActivity extends Activity {
                 }
                 Log.i("升级流程切换：", "wait...");
                 update_step = update_Switch();
+
                 try {
                     sendLen = fin.read(buffer,updateIdex * 98 ,98);
                 } catch (IOException e) {
@@ -329,7 +340,7 @@ public class DeviceControlActivity extends Activity {
                 if(sendLen > 0)
                 {
                     Log.i("发送文件数据：", "wait...");
-                    UpdateOpt.WriteComm(writecharacteristic, buffer, sendLen);
+                    WriteComm(writecharacteristic, buffer, sendLen);
                 }
                 if(update_step == 5)
                 {
@@ -421,11 +432,11 @@ public class DeviceControlActivity extends Activity {
                     //receiveDataFlag = true;
                     updateState.setText("收到回应");
 
-                    synchronized(object)
-                    {
-                        Log.i("解锁通知：", "wait...");
-                        object.notify(); // 恢复线程
-                    }
+//                    synchronized(object)
+//                    {
+//                        Log.i("解锁通知：", "wait...");
+//                        object.notify(); // 恢复线程
+//                    }
 
                     break;
                 case 2:
@@ -575,11 +586,11 @@ public class DeviceControlActivity extends Activity {
     }
 
     //读SD中的文件
-    public static byte[] readFileSdcardFile(String fileName) throws IOException{
+    public byte[] readFileSdcardFile(String fileName) throws IOException{
         String res="";
         byte [] buffer = null;
         try{
-            FileInputStream fin = new FileInputStream(UpdateOpt.getSdCardPath() + fileName);
+            FileInputStream fin = new FileInputStream(updateOpt.getSdCardPath() + fileName);
             int length = fin.available();
             buffer = new byte[length];
             fin.read(buffer);
@@ -709,8 +720,57 @@ public class DeviceControlActivity extends Activity {
         }
         temp[len+4] = (byte)sum;
         //Log.i("调用特征值写：", "wait...");
-        UpdateOpt.WriteComm(writecharacteristic,temp, len+6);
+        WriteComm(writecharacteristic,temp, len+6);
 
         return true;
+    }
+
+    public static Boolean WriteComm(BluetoothGattCharacteristic WriteCharacteristic, byte[] SendData, int DateCount)
+    {
+        Boolean bool = false;
+        if(DateCount>20){
+            for(int i = 0;i<DateCount;i=i+20)
+            {
+                bool = WriteCharacteristic.setValue(UpdateOpt.subBytes(SendData, i, 20));
+                PrintLog.printHexString("Gatt写长数据",WriteCharacteristic.getValue());
+                //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+                WriteCharacterRspFlag = false;
+                while (!WriteCharacterRspFlag)
+                {
+                    BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+                    try {
+                        Thread.currentThread().sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.i("回应标志：", WriteCharacterRspFlag.toString());
+                WriteCharacterRspFlag = false;
+            }
+            bool = true;
+        }else {
+            bool = WriteCharacteristic.setValue(SendData);
+            PrintLog.printHexString("Gatt写短数据",WriteCharacteristic.getValue());
+            if (bool) {
+                //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+                WriteCharacterRspFlag = false;
+                while (!WriteCharacterRspFlag)
+                {
+                    BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+                    try {
+                        Thread.currentThread().sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                bool = true;
+                Log.i("回应标志：", WriteCharacterRspFlag.toString());
+                WriteCharacterRspFlag = false;
+            } else {
+                Log.i("写特征值：", "本地写失败");
+                bool = false;
+            }
+        }
+        return bool;
     }
 }
