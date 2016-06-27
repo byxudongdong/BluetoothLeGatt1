@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,7 +59,7 @@ public class DeviceScanActivity extends ListActivity {
         getActionBar().setTitle(R.string.title_devices);
         mHandler = new Handler();
 
-       MyNative.update_checkSetFlag(1);
+       Log.i("MyNative",String.valueOf(MyNative.update_checkSetFlag(1)));
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {

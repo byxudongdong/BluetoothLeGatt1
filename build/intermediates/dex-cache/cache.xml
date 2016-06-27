@@ -1,26 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" >
+<items version="2" />
 
-    <item
-        jar="H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\jars\libs\internal_impl-20.0.0.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d">
-        <dex dex="H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\pre-dexed\debug\internal_impl-20.0.0_e05b10faea4b5adb59cf983b435b638228e66118.jar" />
-    </item>
-    <item
-        jar="H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="8694693636ab36910c8100ce527c258ff3ebece0">
-        <dex dex="H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\pre-dexed\debug\com.android.support-support-v4-20.0.0_87dae3ef1242a4ec9ad9b0039015feb02d89dfc6.jar" />
-    </item>
-    <item
-        jar="H:\SDK\extras\android\m2repository\com\android\support\support-annotations\20.0.0\support-annotations-20.0.0.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="9d9013e9ff35fc3756411e62873c363c70c638fa">
-        <dex dex="H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\pre-dexed\debug\support-annotations-20.0.0_e6f3803b2fecfe4c76692579c80e60f4b4a56645.jar" />
-    </item>
-
-</items>
