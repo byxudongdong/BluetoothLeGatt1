@@ -58,6 +58,7 @@ public class DeviceScanActivity extends ListActivity {
         getActionBar().setTitle(R.string.title_devices);
         mHandler = new Handler();
 
+       MyNative.update_checkSetFlag(1);
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -143,6 +144,13 @@ public class DeviceScanActivity extends ListActivity {
         super.onPause();
         scanLeDevice(false);
         mLeDeviceListAdapter.clear();
+    }
+
+    @Override
+    protected  void onDestroy(){
+        super.onDestroy();
+        //mBluetoothAdapter.cancelDiscovery();
+        //mBluetoothAdapter.disable();
     }
 
     @Override

@@ -3,6 +3,8 @@ manifest
 ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:20:1-56:12
 	package
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:21:5-50
+		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml
+		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml
 	android:versionName
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:23:5-30
 		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml
@@ -37,7 +39,7 @@ ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:39:
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:39:22-78
 application
 ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:42:5-54:19
-MERGED from [com.android.support:support-v4:23.3.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:20.0.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\AndroidManifest.xml:17:5-19
 	android:label
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:42:18-50
 	android:icon
@@ -72,7 +74,7 @@ ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:53:
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:53:18-52
 uses-sdk
 INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml reason: use-sdk injection requested
-MERGED from [com.android.support:support-v4:23.3.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:20.0.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\AndroidManifest.xml:16:5-42
 	android:targetSdkVersion
 		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml
 		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml

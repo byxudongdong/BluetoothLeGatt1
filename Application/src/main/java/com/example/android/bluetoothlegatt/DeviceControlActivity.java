@@ -147,11 +147,10 @@ public class DeviceControlActivity extends Activity {
                 //Log.i("显示接受数据","将接受数据显示在mDataField上");
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 receiveDataFlag = true;
-                PrintLog.printHexString("接收到data*****",data);
+                PrintLog.printHexString("接收到data*****************",data);
                 displayData(PrintLog.returnHexString(data));
-                Message message = new Message();
-                message.what = 1;
-                handler.sendMessage(message);
+                sendMessage(1);
+                updateReceive_respons(data,data[1]);
             }
 
             else if(BluetoothLeService.EXTRA_DATA.equals(action))
@@ -162,6 +161,7 @@ public class DeviceControlActivity extends Activity {
             {
                 WriteCharacterRspFlag = true;
                 Log.i("写数据结果","回应成功");
+
             }
         }
     };
@@ -267,7 +267,7 @@ public class DeviceControlActivity extends Activity {
                     UpdateStepWaitImageRes = 3,
                     UpdateStepWaitCRCRes = 4,
                     UpdateStepCRCResRecv = 5;
-    public int sendLen=0,filedataLen=0,updateIdex= 0,update_step = UpdateStepSendRequst;
+    public int update_sendLen=0,filedataLen=0,updateIdex= 0,update_step = UpdateStepSendRequst;
     public long startTime=0,consumingTime=0;  //開始時間
     FileInputStream fin = null;
     byte [] buffer = null;
@@ -295,7 +295,7 @@ public class DeviceControlActivity extends Activity {
             //读SD中的文件
 
             try{
-                String filePath = updateOpt.getSdCardPath() + "/classes.dex";
+                String filePath = updateOpt.getSdCardPath() + "/image_W16_15_20160606_c.hyc";
                 fin = new FileInputStream(filePath);
                 filedataLen = fin.available();
                 buffer = new byte[98];
@@ -304,10 +304,8 @@ public class DeviceControlActivity extends Activity {
                 e.printStackTrace();
             }
 
-            while(updateFlag)
-            {
-                byte[] bytes = updateOpt.wakeupData;        //写入发送数据
-                //Boolean bool = WriteComm( writecharacteristic, bytes, bytes.length);
+            byte[] bytes = updateOpt.wakeupData;        //写入发送数据
+            //Boolean bool = WriteComm( writecharacteristic, bytes, bytes.length);
 //
 //                synchronized(object)
 //                {
@@ -318,6 +316,9 @@ public class DeviceControlActivity extends Activity {
 //                        e.printStackTrace();
 //                    }
 //                }
+
+            while(updateFlag)
+            {
                 //发送唤醒
                 if(update_step == 0)
                 {
@@ -329,18 +330,19 @@ public class DeviceControlActivity extends Activity {
                         Log.i("等待延时：", "wait...");
                     }
                 }
-                Log.i("升级流程切换：", "wait...");
+                //Log.i("升级流程切换：", "wait...");
                 update_step = update_Switch();
 
                 try {
-                    sendLen = fin.read(buffer,updateIdex * 98 ,98);
+                    update_sendLen = fin.read(buffer,updateIdex * 98 ,98);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if(sendLen > 0)
+                if(update_sendLen > 0)
                 {
                     Log.i("发送文件数据：", "wait...");
-                    WriteComm(writecharacteristic, buffer, sendLen);
+                    //WriteComm(writecharacteristic, buffer, sendLen);
+                    comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, buffer, update_sendLen);
                 }
                 if(update_step == 5)
                 {
@@ -352,7 +354,7 @@ public class DeviceControlActivity extends Activity {
                     break;
                 }
 
-                updateFlag = false;
+                //updateFlag = false;
             }
 
             try {
@@ -387,7 +389,7 @@ public class DeviceControlActivity extends Activity {
                         e.printStackTrace();
                     }
                 }
-                //update_sendSize = 0;
+                update_sendSize = 0;
                 update_step++;
                 consumingTime = startTime;
                 break;
@@ -395,7 +397,7 @@ public class DeviceControlActivity extends Activity {
                 Log.i("发送升级文件：", "wait...");
                 sendMessage( 3 );
                 /* 发送升级数据 */
-                //update_sendLen = update_sendImageData();
+                update_sendLen = update_sendImageData();
                 consumingTime = startTime;
                 update_step++;
                 break;
@@ -467,6 +469,8 @@ public class DeviceControlActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         unbindService(mServiceConnection);
+        mBluetoothLeService.disconnect();
+        mBluetoothLeService.close();
         mBluetoothLeService = null;
     }
 
@@ -690,6 +694,13 @@ public class DeviceControlActivity extends Activity {
 /* 封包最小长度 */
     int	    COMM_PAKET_LEN_MIN	=	(6);
     int 	COMM_DATA_BUF_LEN	    =	(1024);
+    int     UPDATE_SEND_PAKET_SIZE  = 92;
+
+    final int UPDATE_REQUEST_ID		=	(int)(0xFFFD);
+    final int UPDATE_CRC_RESP_ID		=	(int)(0xFFFC);
+    final byte UPDATE_REQUST_OK			=		(0x00);//升级请求被接受
+    final byte UPDATE_REJECT_REASON_HW_ERR		=	(0x01);//硬件版本错误
+    final byte UPDATE_REJECT_REASON_SIZE_ERR	=	(0x02);//升级包大小错误(超过限制)
 
     /*-------------------------------------------------------------------------
 * 函数: comm_send
@@ -773,4 +784,184 @@ public class DeviceControlActivity extends Activity {
         }
         return bool;
     }
+
+    int update_sendImageData()
+    {
+        byte UPDATE_SEND_PAKET_SIZE	=	(92);//(100)//(112)//(32)//(12)//(14)//(64)//
+        byte[] temp = new byte[UPDATE_SEND_PAKET_SIZE+2];
+        int imageReadLen = 0;
+        int index;
+
+        index = (update_sendSize/UPDATE_SEND_PAKET_SIZE)+1;
+        //memcpy(&temp[0], &index, sizeof(U16));
+        temp[0] = (byte) (index >> 8 * 0 & 0xFF);
+        temp[1] = (byte) (index >> 8 * 1 & 0xFF);
+
+        imageReadLen = update_readImageData(temp, update_sendSize, UPDATE_SEND_PAKET_SIZE);
+        if (imageReadLen <= 0)
+        {
+		/* 升级数据发送完成 */
+            return 0;
+        }
+
+        comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, temp, imageReadLen+2);
+
+        return imageReadLen;
+    }
+
+    /*-------------------------------------------------------------------------
+* 函数: update_readImageData
+* 说明: 读取image数据
+* 参数: ptUpdataInfo
+* 返回: 读取大小
+-------------------------------------------------------------------------*/
+    int update_readImageData(byte pData[], int offset, int len)
+    {
+        int readLen;
+        byte[] senddata=new byte[98];
+
+        if (offset >= filedataLen)
+        {
+            //readLen = 0;
+            return -1;
+        }
+        else if ((offset+len) > filedataLen)
+        {
+            readLen = filedataLen - offset;
+        }
+        else
+        {
+            readLen = len;
+        }
+        try {
+            readLen = fin.read(senddata,offset ,98);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.arraycopy(senddata , 0, pData, 2 , readLen);
+
+        return readLen;
+    }
+
+    final int UPDATE_STEP_SEND_REQUEST	=	0;
+    final int UPDATE_STEP_WAIT_REQUEST_RES=	1;
+
+    final int UPDATE_STEP_SEND_IMAGE		=	2;
+    final int UPDATE_STEP_WAIT_IMAGE_RES	=	3;
+
+    final int UPDATE_STEP_WAIT_CRC_RES	=	4;
+    final int UPDATE_STEP_CRC_RES_RECV 	=	5;
+
+    void updateReceive_respons(byte[] pdata, int len)
+    {
+        int index, offset;
+        int respons;
+        int ret;
+
+        offset = 4;
+        //memcpy(&index, &pdata[offset], sizeof(U16));
+        index = (pdata[offset] & 0xFF) << (8 * 0) +  (pdata[offset+1] & 0xFF) << (8 * 1);
+        offset += 2;
+        switch (index)
+        {
+            case UPDATE_REQUEST_ID:
+                Log.i("硬件版本错误....","");
+//                if (len > 3) ret = update_checkSetFlag(1);
+//                else ret = update_checkSetFlag(0);
+//                if (ret == 0)
+//                {
+//                    if (pdata[offset] == UPDATE_REJECT_REASON_HW_ERR)
+//                    {
+//				/* 硬件版本错误 */
+//                        imageIndex++;
+//                        if (imageIndex >= imageNum) imageIndex = 0;
+//                    }
+//                    ret = update_getImageInfo(imageIndex, NULL,
+//                            (int *)&tUpdate_info.hw_info,
+//                        (int *)&tUpdate_info.image_size,
+//                        (int *)&tUpdate_info.image_crc,
+//                        (char **)&tUpdate_info.image_data);
+//                    return;
+//                }
+		        /* 接收升级请求回应 */
+                switch(pdata[offset])
+                {
+                    case UPDATE_REQUST_OK:
+			        /* 升级请求被接受 */
+                        Log.i("请求被接收....","");
+                        try {
+                            Thread.currentThread().sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        update_step++;
+                        if (len > 3)
+                        {
+                            Log.i("芯片支持OAD....","");
+                            //supportCipher = true;
+                        }
+                        else
+                        {
+                            Log.i("不支持OAD....","");
+                            //supportCipher = false;
+                        }
+
+                        break;
+                    case UPDATE_REJECT_REASON_HW_ERR:
+			        /* 硬件版本错误 */
+                        Log.i("硬件版本错误....","");
+//                        imageIndex++;
+//                        if (imageIndex >= imageNum) imageIndex = 0;
+//                        ret = update_getImageInfo(imageIndex, NULL,
+//                                (int *)&tUpdate_info.hw_info,
+//                            (int *)&tUpdate_info.image_size,
+//                            (int *)&tUpdate_info.image_crc,
+//                            (char **)&tUpdate_info.image_data);
+                        break;
+                    case UPDATE_REJECT_REASON_SIZE_ERR:
+			        /* 升级包大小错误(超过限制) */
+                        Log.i("升级包大小错误(超过限制)","");
+                        break;
+                }
+                break;
+            case UPDATE_CRC_RESP_ID:
+		    /* 收到CRC校验回应 */
+                if (pdata[offset] == 0)
+                {
+			        /* CRC校验正确 */
+                    //mySetRecvInfo("CRC校验正确");
+                    update_step = UPDATE_STEP_CRC_RES_RECV;
+                }
+                else
+                {
+			        /* 校验值错误，重发升级请求，重新升级 */
+                    Log.i("校验值错误，重发升级请求，重新升级","");
+                    update_step = UPDATE_STEP_SEND_REQUEST;
+                }
+                break;
+            default:
+		    /* 升级数据包回应 */
+                if(pdata[offset] == 0 && index == (update_sendSize/UPDATE_SEND_PAKET_SIZE)+1 )
+                {
+			        /* 数据包被正确接收 */
+                    update_sendSize += update_sendLen;
+                    if (update_sendSize >= filedataLen)
+                    {
+				        /* 数据包发送完成，等待CRC校验结果 */
+                        Log.i("数据包发送完成，等待CRC校验结果","");
+                        update_step = UPDATE_STEP_WAIT_CRC_RES;
+                        break;
+                    }
+                }
+                else
+                {
+                    Log.i("数据包接收错误，重发","");
+			        /* 数据包接收错误，重发 */
+                }
+                update_step--;
+                break;
+        }
+    }
+
 }
