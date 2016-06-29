@@ -44,6 +44,7 @@ import java.util.Arrays;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class DeviceScanActivity extends ListActivity {
+    MyNative myNative = new MyNative();
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -59,7 +60,7 @@ public class DeviceScanActivity extends ListActivity {
         getActionBar().setTitle(R.string.title_devices);
         mHandler = new Handler();
 
-       Log.i("MyNative",String.valueOf(MyNative.update_checkSetFlag(1)));
+        Log.i("MyNative",String.valueOf(myNative.update_checkSetFlag(1)));
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {

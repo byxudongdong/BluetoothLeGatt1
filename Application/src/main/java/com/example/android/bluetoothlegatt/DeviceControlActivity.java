@@ -31,6 +31,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +56,9 @@ import java.util.UUID;
  * Bluetooth LE API.
  */
 public class DeviceControlActivity extends Activity {
+    tUpdate_info tUpdate_info = new tUpdate_info();
+    MyNative myNative = new MyNative();
+
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
 
     public static Boolean receiveDataFlag = false;
@@ -296,8 +300,11 @@ public class DeviceControlActivity extends Activity {
 
             try{
                 String filePath = updateOpt.getSdCardPath() + "/image_W16_15_20160606_c.hyc";
+                imageNum = myNative.update_fileParse(filePath.getBytes());
+                Log.i("升级文件个数",String.valueOf(imageNum));
                 fin = new FileInputStream(filePath);
                 filedataLen = fin.available();
+                Log.i("文件字节数",String.valueOf(filedataLen));
                 buffer = new byte[98];
 
             } catch(Exception e){
@@ -333,17 +340,19 @@ public class DeviceControlActivity extends Activity {
                 //Log.i("升级流程切换：", "wait...");
                 update_step = update_Switch();
 
-                try {
-                    update_sendLen = fin.read(buffer,updateIdex * 98 ,98);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(update_sendLen > 0)
-                {
-                    Log.i("发送文件数据：", "wait...");
-                    //WriteComm(writecharacteristic, buffer, sendLen);
-                    comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, buffer, update_sendLen);
-                }
+//                try {
+//                    int offset = updateIdex * 98 +1024;
+//                    if(offset <= filedataLen)
+//                        update_sendLen = fin.read(buffer,offset ,98);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                if(update_sendLen > 0)
+//                {
+//                    Log.i("发送文件数据：", "wait...");
+//                    //WriteComm(writecharacteristic, buffer, sendLen);
+//                    comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, buffer, update_sendLen);
+//                }
                 if(update_step == 5)
                 {
                     //升级完成后
@@ -472,6 +481,19 @@ public class DeviceControlActivity extends Activity {
         mBluetoothLeService.disconnect();
         mBluetoothLeService.close();
         mBluetoothLeService = null;
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            //do something...
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -628,14 +650,14 @@ public class DeviceControlActivity extends Activity {
         //发送升级请求，并等待回应
         //requestId = UPDATE_REQUEST_ID;
         //memcpy(&temp[len], &requestId, 2);
-        temp[len] = (byte)0xFD;
+        temp[len] = (byte)0xFF;
         temp[len+1] = (byte)0xFF;
         len += 2;
         //memcpy(&temp[len], &tUpdate_info.hw_info, 4);
-        temp[len] = (byte)0x01;
-        temp[len+1] = (byte)0x00;
-        temp[len+2] = (byte)0x01;
-        temp[len+3] = (byte)0x00;
+        temp[len] = (byte)0x00;
+        temp[len+1] = (byte)0x03;
+        temp[len+2] = (byte)0x00;
+        temp[len+3] = (byte)0x01;
         len += 4;
         //memcpy(&temp[len], &tUpdate_info.image_size, 4);
         temp[len] = (byte)0x00;
@@ -696,8 +718,11 @@ public class DeviceControlActivity extends Activity {
     int 	COMM_DATA_BUF_LEN	    =	(1024);
     int     UPDATE_SEND_PAKET_SIZE  = 92;
 
-    final int UPDATE_REQUEST_ID		=	(int)(0xFFFD);
-    final int UPDATE_CRC_RESP_ID		=	(int)(0xFFFC);
+    //final int UPDATE_REQUEST_ID		=	(int)(0xFFFD);
+    //final int UPDATE_CRC_RESP_ID		=	(int)(0xFFFC);
+    final int UPDATE_REQUEST_ID	 =	(int)	(0xFFFF);
+    final int UPDATE_CRC_RESP_ID 	=(int) (0xFFFE);
+
     final byte UPDATE_REQUST_OK			=		(0x00);//升级请求被接受
     final byte UPDATE_REJECT_REASON_HW_ERR		=	(0x01);//硬件版本错误
     final byte UPDATE_REJECT_REASON_SIZE_ERR	=	(0x02);//升级包大小错误(超过限制)
@@ -739,6 +764,7 @@ public class DeviceControlActivity extends Activity {
     public static Boolean WriteComm(BluetoothGattCharacteristic WriteCharacteristic, byte[] SendData, int DateCount)
     {
         Boolean bool = false;
+        int count = 0;
         if(DateCount>20){
             for(int i = 0;i<DateCount;i=i+20)
             {
@@ -748,6 +774,11 @@ public class DeviceControlActivity extends Activity {
                 WriteCharacterRspFlag = false;
                 while (!WriteCharacterRspFlag)
                 {
+                    count++;
+                    if(count == 5) {
+                        count = 0;
+                        break;
+                    }
                     BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
                         Thread.currentThread().sleep(10);
@@ -767,6 +798,11 @@ public class DeviceControlActivity extends Activity {
                 WriteCharacterRspFlag = false;
                 while (!WriteCharacterRspFlag)
                 {
+                    count++;
+                    if(count == 5) {
+                        count = 0;
+                        break;
+                    }
                     BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
                         Thread.currentThread().sleep(10);
@@ -852,6 +888,9 @@ public class DeviceControlActivity extends Activity {
     final int UPDATE_STEP_WAIT_CRC_RES	=	4;
     final int UPDATE_STEP_CRC_RES_RECV 	=	5;
 
+    public int imageIndex = 0,imageNum=0;
+    Boolean supportCipher = false;
+
     void updateReceive_respons(byte[] pdata, int len)
     {
         int index, offset;
@@ -860,29 +899,29 @@ public class DeviceControlActivity extends Activity {
 
         offset = 4;
         //memcpy(&index, &pdata[offset], sizeof(U16));
-        index = (pdata[offset] & 0xFF) << (8 * 0) +  (pdata[offset+1] & 0xFF) << (8 * 1);
+        index = (pdata[offset] & 0xFF) | (pdata[offset+1] & 0x00FF)<<8 ;
         offset += 2;
         switch (index)
         {
             case UPDATE_REQUEST_ID:
                 Log.i("硬件版本错误....","");
-//                if (len > 3) ret = update_checkSetFlag(1);
-//                else ret = update_checkSetFlag(0);
-//                if (ret == 0)
-//                {
-//                    if (pdata[offset] == UPDATE_REJECT_REASON_HW_ERR)
-//                    {
-//				/* 硬件版本错误 */
-//                        imageIndex++;
-//                        if (imageIndex >= imageNum) imageIndex = 0;
-//                    }
-//                    ret = update_getImageInfo(imageIndex, NULL,
-//                            (int *)&tUpdate_info.hw_info,
-//                        (int *)&tUpdate_info.image_size,
-//                        (int *)&tUpdate_info.image_crc,
-//                        (char **)&tUpdate_info.image_data);
-//                    return;
-//                }
+                if (len > 3) ret = myNative.update_checkSetFlag(1);
+                else ret = myNative.update_checkSetFlag(0);
+                if (ret == 0)
+                {
+                    if (pdata[offset] == UPDATE_REJECT_REASON_HW_ERR)
+                    {
+				/* 硬件版本错误 */
+                        imageIndex++;
+                        if (imageIndex >= imageNum) imageIndex = 0;
+                    }
+                    ret = myNative.update_getImageInfo(imageIndex, tUpdate_info.ppVer_Str,
+                            tUpdate_info.hw_info,
+                            tUpdate_info.image_size,
+                            tUpdate_info.image_crc,
+                            (byte[][] ) tUpdate_info.image_data);
+                    return;
+                }
 		        /* 接收升级请求回应 */
                 switch(pdata[offset])
                 {
@@ -899,25 +938,25 @@ public class DeviceControlActivity extends Activity {
                         if (len > 3)
                         {
                             Log.i("芯片支持OAD....","");
-                            //supportCipher = true;
+                            supportCipher = true;
                         }
                         else
                         {
                             Log.i("不支持OAD....","");
-                            //supportCipher = false;
+                            supportCipher = false;
                         }
 
                         break;
                     case UPDATE_REJECT_REASON_HW_ERR:
 			        /* 硬件版本错误 */
                         Log.i("硬件版本错误....","");
-//                        imageIndex++;
-//                        if (imageIndex >= imageNum) imageIndex = 0;
-//                        ret = update_getImageInfo(imageIndex, NULL,
-//                                (int *)&tUpdate_info.hw_info,
-//                            (int *)&tUpdate_info.image_size,
-//                            (int *)&tUpdate_info.image_crc,
-//                            (char **)&tUpdate_info.image_data);
+                        imageIndex++;
+                        if (imageIndex >= imageNum) imageIndex = 0;
+                        ret = myNative.update_getImageInfo(imageIndex,tUpdate_info.ppVer_Str,
+                                tUpdate_info.hw_info,
+                                tUpdate_info.image_size,
+                                tUpdate_info.image_crc,
+                                (byte[][] ) tUpdate_info.image_data);
                         break;
                     case UPDATE_REJECT_REASON_SIZE_ERR:
 			        /* 升级包大小错误(超过限制) */
@@ -931,6 +970,7 @@ public class DeviceControlActivity extends Activity {
                 {
 			        /* CRC校验正确 */
                     //mySetRecvInfo("CRC校验正确");
+                    Log.i("CRC校验正确","");
                     update_step = UPDATE_STEP_CRC_RES_RECV;
                 }
                 else
