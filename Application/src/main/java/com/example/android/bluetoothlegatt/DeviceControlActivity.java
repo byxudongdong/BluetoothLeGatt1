@@ -389,7 +389,7 @@ public class DeviceControlActivity extends Activity {
         {
             case UpdateStepSendRequst:
                 //发送升级请求
-                Log.i("发送升级请求：", "wait...");
+                Log.i("发送升级请求：", "发送升级请求");
                 sendMessage( 2 );
                 receiveDataFlag = false;
                 //while(!receiveDataFlag)
@@ -406,7 +406,7 @@ public class DeviceControlActivity extends Activity {
                 startTime = System.currentTimeMillis();  //開始時間
                 break;
             case UpdateStepSendImage:
-                Log.i("发送升级文件：", "wait...");
+                Log.i("发送升级文件：", "发送升级文件");
                 sendMessage( 3 );
                 /* 发送升级数据 */
                 update_sendLen = update_sendImageData();
@@ -422,16 +422,30 @@ public class DeviceControlActivity extends Activity {
                 }
                 break;
             case UpdateStepWaitImageRes:
-
+                /* 等待升级请求和升级数据回应 */
+                if ((consumingTime - startTime) >= 3000)
+                {
+			        /* 超时重发 */
+                    update_step = UPDATE_STEP_SEND_IMAGE;
+                }
                 break;
             case UpdateStepWaitCRCRes:
-
+                /* 等待升级请求和升级数据回应 */
+                if ((consumingTime - startTime) >= 5000)
+                {
+                    /* 超时 */
+                    /* 重启，认为升级成功 */
+                    //mySetRecvInfo("升级完成");
+                    Log.i("升级完成：", "升级完成");
+                    update_step = UPDATE_STEP_CRC_RES_RECV;
+                }
                 break;
             case UpdateStepCRCResRecv:
-
+                Log.i("CRC校验正确", "升级完成");
+                Log.i("升级完成", "升级完成");
+                //升级成功
                 break;
         }
-
         return update_step;
     }
 
@@ -465,7 +479,6 @@ public class DeviceControlActivity extends Activity {
         }
     };
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -489,7 +502,6 @@ public class DeviceControlActivity extends Activity {
         mBluetoothLeService.disconnect();
         mBluetoothLeService.close();
         mBluetoothLeService = null;
-
     }
 
     @Override
@@ -648,12 +660,9 @@ public class DeviceControlActivity extends Activity {
         byte temp[] = new byte[32];
         int requestId;
         int len;
-
         //supportCipher = false;
-
 	/* 已发送数据大小 */
         update_sendSize = 0;
-
         len = 0;
         //发送升级请求，并等待回应
         //requestId = UPDATE_REQUEST_ID;
@@ -662,27 +671,14 @@ public class DeviceControlActivity extends Activity {
         temp[len+1] = (byte)0xFF;
         len += 2;
         //memcpy(&temp[len], &tUpdate_info.hw_info, 4);
-//        temp[len] = (byte)0x00;
-//        temp[len+1] = (byte)0x03;
-//        temp[len+2] = (byte)0x00;
-//        temp[len+3] = (byte)0x01;
         System.arraycopy(Update_info.hw_info,0,temp,len,4);
         len += 4;
         //memcpy(&temp[len], &tUpdate_info.image_size, 4);
-//        temp[len] = (byte)0x00;
-//        temp[len+1] = (byte)0x80;
-//        temp[len+2] = (byte)0x00;
-//        temp[len+3] = (byte)0x00;
         System.arraycopy(Update_info.image_size,0,temp,len,4);
         len += 4;
         //memcpy(&temp[len], &tUpdate_info.image_crc, 4);
-//        temp[len] = (byte)0x12;
-//        temp[len+1] = (byte)0x34;
-//        temp[len+2] = (byte)0x56;
-//        temp[len+3] = (byte)0x78;
         System.arraycopy(Update_info.image_crc,0,temp,len,4);
         len += 4;
-
         //comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, &temp[1], len-1);//只为唤醒目标机
         //Delay(50);
         comm_send(COMM_TRANS_TYPE_SEND, COMM_CMD_TYPE_UPDATE, temp, len);
@@ -882,11 +878,12 @@ public class DeviceControlActivity extends Activity {
         {
             readLen = len;
         }
-        try {
-            readLen = fin.read(senddata,offset ,98);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            readLen = fin.read(senddata,offset ,98);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        System.arraycopy(Update_info.image_data,offset,senddata,0,readLen);
         System.arraycopy(senddata , 0, pData, 2 , readLen);
 
         return readLen;
@@ -925,7 +922,7 @@ public class DeviceControlActivity extends Activity {
                     if (pdata[offset] == UPDATE_REJECT_REASON_HW_ERR)
                     {
 				        /* 硬件版本错误 */
-                        Log.i("硬件版本错误....","硬件版本错误");
+                        Log.i("硬件版本错误....","重新发送升级请求");
                         imageIndex++;
                         if (imageIndex >= imageNum) imageIndex = 0;
                     }
@@ -934,6 +931,8 @@ public class DeviceControlActivity extends Activity {
                             Update_info.image_size,
                             Update_info.image_crc,
                             Update_info.image_data);
+                    filedataLen = UpdateOpt.byteArrayToInt(Update_info.image_size);
+                    Log.i("更换升级文件：=",String.valueOf(imageIndex) +":" + String.valueOf(filedataLen));
                     return;
                 }
 		        /* 接收升级请求回应 */
@@ -971,7 +970,8 @@ public class DeviceControlActivity extends Activity {
                                 Update_info.image_size,
                                 Update_info.image_crc,
                                 Update_info.image_data);
-                        Log.i("更换升级文件：=",String.valueOf(imageIndex));
+                        filedataLen = UpdateOpt.byteArrayToInt(Update_info.image_size);
+                        Log.i("更换升级文件：=",String.valueOf(imageIndex) +":" + String.valueOf(filedataLen));
                         break;
                     case UPDATE_REJECT_REASON_SIZE_ERR:
 			        /* 升级包大小错误(超过限制) */
@@ -1017,6 +1017,7 @@ public class DeviceControlActivity extends Activity {
                 update_step--;
                 break;
         }
+
     }
 
 }
