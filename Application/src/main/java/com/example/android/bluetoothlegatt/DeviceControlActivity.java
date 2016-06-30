@@ -164,7 +164,7 @@ public class DeviceControlActivity extends Activity {
             else if(BluetoothLeService.WRITE_STATUS.equals(action))
             {
                 WriteCharacterRspFlag = true;
-                Log.i("写数据结果","回应成功");
+                //Log.i("写数据结果","回应成功");
 
             }
         }
@@ -418,19 +418,23 @@ public class DeviceControlActivity extends Activity {
                 if ((consumingTime - startTime) >= 3000)
                 {
 			        /* 超时重发 */
+                    Log.i("发送升级请求：", "超时重发");
                     update_step = UPDATE_STEP_SEND_REQUEST;
                 }
                 break;
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
+                consumingTime = System.currentTimeMillis();
                 if ((consumingTime - startTime) >= 3000)
                 {
 			        /* 超时重发 */
+                    Log.i("发送升级文件：", "超时重发");
                     update_step = UPDATE_STEP_SEND_IMAGE;
                 }
                 break;
             case UpdateStepWaitCRCRes:
                 /* 等待升级请求和升级数据回应 */
+                consumingTime = System.currentTimeMillis();
                 if ((consumingTime - startTime) >= 5000)
                 {
                     /* 超时 */
@@ -777,17 +781,23 @@ public class DeviceControlActivity extends Activity {
             {
                 bool = WriteCharacteristic.setValue(UpdateOpt.subBytes(SendData, i, 20));
                 PrintLog.printHexString("Gatt写长数据",WriteCharacteristic.getValue());
-                //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                 WriteCharacterRspFlag = false;
+                BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+//                try{
+//                    Thread.currentThread().sleep(10);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+
                 while (!WriteCharacterRspFlag)
                 {
-                    count++;
-                    if(count == 5) {
-                        count = 0;
-                        Log.i("发送数据：", "分段发送5次失败");
-                        break;
-                    }
-                    BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+//                    count++;
+//                    if(count == 5) {
+//                        count = 0;
+//                        Log.i("发送数据：", "分段发送5次失败");
+//                        break;
+//                    }
+                    //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
                         Thread.currentThread().sleep(10);
                     } catch (InterruptedException e) {
@@ -814,7 +824,7 @@ public class DeviceControlActivity extends Activity {
                     }
                     BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
-                        Thread.currentThread().sleep(10);
+                        Thread.currentThread().sleep(80);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -108,6 +108,10 @@ public class BluetoothLeService extends Service {
             }
         }
 
+        public void onConfigureMTU(BluetoothGatt gatt, int mtu, int status) {
+            Log.i("修改MTU为：",String.valueOf(mtu) +":"+String.valueOf(status));
+        }
+
         public BluetoothGattCharacteristic mcharacteristic, notifacationCharacteristic;
         public void discovered_service() {
             List<BluetoothGattService> mGattService = DeviceControlActivity.mBluetoothLeService
@@ -397,5 +401,11 @@ public class BluetoothLeService extends Service {
         if (mBluetoothGatt == null) return null;
 
         return mBluetoothGatt.getService(uuid);
+    }
+
+    public void changeMtu(int mtu)
+    {
+        //mBluetoothGatt.configureMTU(128);
+        //BluetoothGatt.requestMtu(128);
     }
 }
