@@ -35,6 +35,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -252,6 +253,7 @@ public class DeviceControlActivity extends Activity {
                 if(mConnected)
                 {
                     Log.i("开始升级", "button onClick");
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     upDateButton.setClickable(false);
 
                     //int ret = update_fileParse(fileName);
@@ -406,10 +408,19 @@ public class DeviceControlActivity extends Activity {
                 startTime = System.currentTimeMillis();  //開始時間
                 break;
             case UpdateStepSendImage:
-                Log.i("发送升级文件：", "发送升级文件");
+                Log.i("发送升级文件：", "发送升级文件"+String.valueOf(update_sendSize)
+                                                    + ":"+String.valueOf(filedataLen) );
                 sendMessage( 3 );
                 /* 发送升级数据 */
+                if( update_sendSize >= filedataLen) {
+                    update_step = UPDATE_STEP_WAIT_CRC_RES;
+                    break;
+                }
                 update_sendLen = update_sendImageData();
+                if( update_sendLen < 1 ) {
+                    update_step = UPDATE_STEP_WAIT_CRC_RES;
+                    break;
+                }
                 startTime = System.currentTimeMillis();  //開始時間
                 update_step++;
                 break;
@@ -435,7 +446,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitCRCRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 5000)
+                if ((consumingTime - startTime) >= 8000)
                 {
                     /* 超时 */
                     /* 重启，认为升级成功 */
@@ -462,6 +473,7 @@ public class DeviceControlActivity extends Activity {
             switch(msg.what){
                 case 0:
                     update_step = 0;
+                    //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     Toast.makeText(getApplicationContext(), "升级成功！！！", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
@@ -1003,6 +1015,8 @@ public class DeviceControlActivity extends Activity {
 			        /* 校验值错误，重发升级请求，重新升级 */
                     Log.i("校验值错误，重发升级请求，重新升级","校验值错误");
                     update_step = UPDATE_STEP_SEND_REQUEST;
+                    update_sendSize = 0;
+
                 }
                 break;
             default:
