@@ -302,12 +302,18 @@ public class DeviceControlActivity extends Activity {
             //读SD中的文件
             try{
                 String filePath = updateOpt.getSdCardPath() + "/image_W16_15_20160606_c.hyc";
-                imageNum = myNative.update_fileParse(filePath.getBytes());
+                try {
+                    imageNum = myNative.update_fileParse(filePath.getBytes());
+                }catch (Exception  e) {
+                    Log.i("升级文件不错在：", "请放入升级文件");
+                    sendMessage(6);
+                }
+
                 Log.i("升级文件个数",String.valueOf(imageNum));
 
                 fin = new FileInputStream(filePath);
-                filedataLen = fin.available();
-                Log.i("文件字节数",String.valueOf(filedataLen));
+                int filedataLenTotal = fin.available();
+                Log.i("文件字节数",String.valueOf(filedataLenTotal));
                 buffer = new byte[98];
             } catch(Exception e){
                 e.printStackTrace();
@@ -436,7 +442,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 3000)
+                if ((consumingTime - startTime) >= 1500)
                 {
 			        /* 超时重发 */
                     Log.i("发送升级文件：", "超时重发");
@@ -490,6 +496,9 @@ public class DeviceControlActivity extends Activity {
                     break;
                 case 2:
                     updateState.setText("发送升级请求");
+                    break;
+                case 6:
+                    Toast.makeText(getApplicationContext(), "请确认升级文件存在根目录？", Toast.LENGTH_LONG).show();
                     break;
             }
         }
