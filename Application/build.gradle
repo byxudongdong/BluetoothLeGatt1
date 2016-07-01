@@ -11,7 +11,7 @@ model {
             targetSdkVersion.apiLevel = 20
         }
         ndk {
-            platformVersion = 20
+            platformVersion = 21
             moduleName = 'JniTest'
             toolchain = 'clang'
             CFlags.add('-std=c99')
