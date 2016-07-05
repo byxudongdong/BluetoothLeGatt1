@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.text.format.Time;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -57,6 +58,14 @@ import java.util.UUID;
  * Bluetooth LE API.
  */
 public class DeviceControlActivity extends Activity {
+    private MyProgress myProgress = null;
+    private Handler mHandler;
+    Boolean getHw_version = false;
+    byte[][] Hw_version = new byte[6][64];
+    int HW_index = 0;
+    int Hw_dataindex = 6;
+    TextView textView ;
+
     tUpdate_info Update_info = new tUpdate_info();
     MyNative myNative = new MyNative();
 
@@ -152,10 +161,40 @@ public class DeviceControlActivity extends Activity {
                 //Log.i("显示接受数据","将接受数据显示在mDataField上");
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 receiveDataFlag = true;
-                PrintLog.printHexString("接收到data*****************",data);
+                PrintLog.printHexString("接收到data*****************", data);
                 displayData(PrintLog.returnHexString(data));
                 sendMessage(1);
-                updateReceive_respons(data,data[1]);
+                if(getHw_version && data != null)
+                {
+                    if(data[0]  == 0x40)
+                    {
+                         HW_index = 0;
+                    }
+                    System.arraycopy(data,0,Hw_version[Hw_dataindex-1],HW_index,data.length);
+                    HW_index = HW_index + data.length;
+                    if( data[data.length -1] == 0x2A)
+                    {
+                        HW_index = 0;
+                        Hw_dataindex --;
+                        if(Hw_dataindex <=0)
+                        {
+                            Hw_dataindex =6;
+                            getHw_version = false;
+                            Log.i("版本信息接受完毕","版本信息接受完毕");
+                            textView.setText(new String(Hw_version[0] )
+                                                +new String(Hw_version[1] )
+                                                +new String(Hw_version[2])
+                                                +new String(Hw_version[3])
+                                                +new String(Hw_version[4])
+                                                +new String(Hw_version[5]));
+
+                        }
+                    }
+
+                }else if(!getHw_version && data != null)
+                {
+                    updateReceive_respons(data, data[1]);
+                }
             }
 
             else if(BluetoothLeService.EXTRA_DATA.equals(action))
@@ -238,15 +277,20 @@ public class DeviceControlActivity extends Activity {
         mDataField = (TextView) findViewById(R.id.data_value);
 
         upDateButton = (Button)findViewById(R.id.updateButton);
+        myProgress = (MyProgress) findViewById(R.id.pgsBar);
         updateState = (EditText) findViewById(R.id.updateState);
+        textView = (TextView)findViewById(R.id.textView);
+
+        //textView.setMovementMethod(ScrollingMovementMethod.getInstance());
+
 
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-        upDateButton.setOnClickListener(new View.OnClickListener() {
-
+        upDateButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -268,7 +312,27 @@ public class DeviceControlActivity extends Activity {
                 }
             }
         });
+
+        new Handler().postDelayed(new Runnable(){
+            public void run() {
+                //execute the task
+                getHw_version = true;
+                mRunnable.run();
+            }
+        }, 3000);
+
     }
+
+    Runnable mRunnable = new Runnable() {
+        public void run() {
+            //自定义功能
+            byte[] bytes = updateOpt.wakeupData;        //写入发送数据
+            WriteComm(writecharacteristic, bytes, bytes.length);
+            byte[] data = {0x00,0x00};
+            Log.i("获取版本","获取版本");
+            comm_send(COMM_TRANS_TYPE_SEND,COMM_CMD_TYPE_VERSION,data,2);
+        }
+    };
 
     public final int UpdateStepSendRequst = 0,
                     UpdateStepWaitRequestRes = 1,
@@ -432,7 +496,7 @@ public class DeviceControlActivity extends Activity {
                 break;
             case UpdateStepWaitRequestRes:
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 3000)
+                if ((consumingTime - startTime) >= 1000)
                 {
 			        /* 超时重发 */
                     Log.i("发送升级请求：", "超时重发");
@@ -442,7 +506,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 1500)
+                if ((consumingTime - startTime) >= 1000)
                 {
 			        /* 超时重发 */
                     Log.i("发送升级文件：", "超时重发");
@@ -452,7 +516,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitCRCRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 8000)
+                if ((consumingTime - startTime) >= 5000)
                 {
                     /* 超时 */
                     /* 重启，认为升级成功 */
@@ -803,12 +867,7 @@ public class DeviceControlActivity extends Activity {
                 bool = WriteCharacteristic.setValue(UpdateOpt.subBytes(SendData, i, 20));
                 PrintLog.printHexString("Gatt写长数据",WriteCharacteristic.getValue());
                 WriteCharacterRspFlag = false;
-                BluetoothLeService.writeCharacteristic(WriteCharacteristic);
-//                try{
-//                    Thread.currentThread().sleep(10);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+                BluetoothLeService.writeCharacteristic(WriteCharacteristic);//BluetoothLeService.writeCharacteristic(WriteCharacteristic);
 
                 while (!WriteCharacterRspFlag)
                 {
@@ -833,19 +892,19 @@ public class DeviceControlActivity extends Activity {
             bool = WriteCharacteristic.setValue(SendData);
             PrintLog.printHexString("Gatt写短数据",WriteCharacteristic.getValue());
             if (bool) {
-                //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
+                BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                 WriteCharacterRspFlag = false;
                 while (!WriteCharacterRspFlag)
                 {
                     count++;
-                    if(count == 5) {
+                    if(count == 4) {
                         count = 0;
-                        Log.i("发送数据：", "发送5次失败");
+                        Log.i("发送数据：", "分段发送5次失败");
                         break;
                     }
                     BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
-                        Thread.currentThread().sleep(80);
+                        Thread.currentThread().sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1034,6 +1093,8 @@ public class DeviceControlActivity extends Activity {
                 {
 			        /* 数据包被正确接收 */
                     update_sendSize += update_sendLen;
+                    int persent = (int)Math.floor(100*((double)update_sendSize/filedataLen));
+                    myProgress.setProgress(persent);
                     if (update_sendSize >= filedataLen)
                     {
 				        /* 数据包发送完成，等待CRC校验结果 */

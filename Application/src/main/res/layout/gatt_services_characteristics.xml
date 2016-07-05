@@ -13,82 +13,117 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
-    <LinearLayout android:orientation="horizontal"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_margin="0dp">
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/label_device_address"
-                  android:textSize="18sp"/>
-        <Space android:layout_width="5dp"
-               android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/device_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"/>
-    </LinearLayout>
-    <LinearLayout android:orientation="horizontal"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_margin="0dp">
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/label_state"
-                  android:textSize="18sp"/>
-        <Space android:layout_width="5dp"
-               android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/connection_state"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="@string/disconnected"
-                  android:textSize="18sp"/>
-    </LinearLayout>
-    <LinearLayout android:orientation="horizontal"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_margin="0dp">
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/label_data"
-                  android:textSize="18sp"/>
-        <Space android:layout_width="5dp"
-               android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/data_value"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="@string/no_data"
-                  android:textSize="18sp"/>
-    </LinearLayout>
+        android:layout_margin="10dp"
+        >
+        <LinearLayout android:orientation="horizontal"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_margin="0dp">
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/label_device_address"
+                      android:textSize="18sp"/>
+            <Space android:layout_width="5dp"
+                   android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/device_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_margin="0dp">
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/label_state"
+                      android:textSize="18sp"/>
+            <Space android:layout_width="5dp"
+                   android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/connection_state"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/disconnected"
+                      android:textSize="18sp"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_margin="0dp">
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/label_data"
+                      android:textSize="18sp"/>
+            <Space android:layout_width="5dp"
+                   android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/data_value"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/no_data"
+                      android:textSize="18sp"/>
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_margin="3dp">
-
-        <Button
-            android:id="@+id/updateButton"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:text="升级指环"/>
-
-        <EditText
-            android:id="@+id/updateState"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="可以开始升级。。。"
-            android:layout_marginLeft="5dp"/>
+            android:orientation="horizontal"
+            android:layout_margin="3dp">
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/updateState"
+                android:layout_width="260dp"
+                android:layout_height="match_parent"
+                android:hint="可以开始升级。。。"
+                android:layout_marginLeft="5dp"/>
 
-    <ExpandableListView android:id="@+id/gatt_services_list"
+            <Button
+                android:id="@+id/updateButton"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:text="升级指环"/>
+
+        </LinearLayout>
+
+        <!--<ProgressBar-->
+            <!--style="?android:attr/progressBarStyleHorizontal"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/progressBar"-->
+            <!--android:max="100"-->
+            <!--android:progress="@android:integer/config_mediumAnimTime"-->
+            <!--android:indeterminate="false" />-->
+
+        <com.example.android.bluetoothlegatt.MyProgress
+            android:id="@+id/pgsBar"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:visibility="visible"
+            android:background="@color/listview_item_normal" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
-</LinearLayout>
+            android:layout_margin="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="HW_info"
+            android:textSize="12sp"
+            android:id="@+id/textView"
+             />
+
+        <ExpandableListView android:id="@+id/gatt_services_list"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:scrollbars="vertical"
+                android:textColor="@color/white"
+                />
+    </LinearLayout>
+</ScrollView>
