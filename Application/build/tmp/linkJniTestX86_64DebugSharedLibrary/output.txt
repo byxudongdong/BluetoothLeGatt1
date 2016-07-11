@@ -1,0 +1,4 @@
+See file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/linkJniTestX86_64DebugSharedLibrary/output.txt for all output for linkJniTestX86_64DebugSharedLibrary.
+linking libJniTest.so successful.
+
+Finished linkJniTestX86_64DebugSharedLibrary, see full log file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/linkJniTestX86_64DebugSharedLibrary/output.txt.

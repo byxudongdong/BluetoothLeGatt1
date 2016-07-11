@@ -1,0 +1,4 @@
+See file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/linkJniTestArmeabi-v7aDebugSharedLibrary/output.txt for all output for linkJniTestArmeabi-v7aDebugSharedLibrary.
+linking libJniTest.so successful.
+
+Finished linkJniTestArmeabi-v7aDebugSharedLibrary, see full log file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/linkJniTestArmeabi-v7aDebugSharedLibrary/output.txt.
