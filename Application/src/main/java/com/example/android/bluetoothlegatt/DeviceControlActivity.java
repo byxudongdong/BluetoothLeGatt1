@@ -174,18 +174,19 @@ public class DeviceControlActivity extends Activity {
                     HW_index = HW_index + data.length;
                     if( data[data.length -1] == 0x2A)
                     {
+                        System.arraycopy(Hw_version[Hw_dataindex-1], 4, Hw_version[Hw_dataindex-1], 0,HW_index-7);
                         HW_index = 0;
                         Hw_dataindex --;
                         if(Hw_dataindex <=0)
                         {
                             Hw_dataindex =6;
-                            getHw_version = false;
+                            //getHw_version = false;
                             Log.i("版本信息接受完毕","版本信息接受完毕");
-                            textView.setText(new String(Hw_version[0] )
-                                                +new String(Hw_version[1] )
-                                                +new String(Hw_version[2])
-                                                +new String(Hw_version[3])
-                                                +new String(Hw_version[4])
+                            textView.setText(new String(Hw_version[0] ) +"\n"
+                                                +new String(Hw_version[1] ) +"\n"
+                                                +new String(Hw_version[2]) +"\n"
+                                                +new String(Hw_version[3]) +"\n"
+                                                +new String(Hw_version[4]) +"\n"
                                                 +new String(Hw_version[5]));
 
                         }
@@ -296,6 +297,7 @@ public class DeviceControlActivity extends Activity {
                 // TODO Auto-generated method stub
                 if(mConnected)
                 {
+                    getHw_version = false;
                     Log.i("开始升级", "button onClick");
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     upDateButton.setClickable(false);
@@ -369,7 +371,7 @@ public class DeviceControlActivity extends Activity {
                 try {
                     imageNum = myNative.update_fileParse(filePath.getBytes());
                 }catch (Exception  e) {
-                    Log.i("升级文件不错在：", "请放入升级文件");
+                    Log.i("升级文件不存在：", "请放入升级文件");
                     sendMessage(6);
                 }
 
@@ -395,6 +397,7 @@ public class DeviceControlActivity extends Activity {
 //                    }
 //                }
             if(imageNum <1) {
+                sendMessage(6);
                 updateFlag = false;
             }else {
                 int ret = myNative.update_getImageInfo(imageIndex, Update_info.ppVer_Str,
@@ -442,12 +445,13 @@ public class DeviceControlActivity extends Activity {
                 }
             }
 
-            try {
-                fin.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(imageNum >0) {
+                try {
+                    fin.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
             Log.i("使能按键：", "wait...");
             update_step = 0;
             upDateButton.setClickable(true);
@@ -488,6 +492,7 @@ public class DeviceControlActivity extends Activity {
                 }
                 update_sendLen = update_sendImageData();
                 if( update_sendLen < 1 ) {
+                    startTime = System.currentTimeMillis();  //開始時間
                     update_step = UPDATE_STEP_WAIT_CRC_RES;
                     break;
                 }
@@ -496,7 +501,7 @@ public class DeviceControlActivity extends Activity {
                 break;
             case UpdateStepWaitRequestRes:
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 1000)
+                if ((consumingTime - startTime) >= 2000)
                 {
 			        /* 超时重发 */
                     Log.i("发送升级请求：", "超时重发");
@@ -506,7 +511,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 1000)
+                if ((consumingTime - startTime) >= 800)
                 {
 			        /* 超时重发 */
                     Log.i("发送升级文件：", "超时重发");
@@ -899,12 +904,12 @@ public class DeviceControlActivity extends Activity {
                     count++;
                     if(count == 4) {
                         count = 0;
-                        Log.i("发送数据：", "分段发送5次失败");
+                        Log.i("发送短数据：", "发送4次失败");
                         break;
                     }
                     BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
-                        Thread.currentThread().sleep(100);
+                        Thread.currentThread().sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1032,7 +1037,7 @@ public class DeviceControlActivity extends Activity {
 			        /* 升级请求被接受 */
                         Log.i("请求被接收....","请求被接收");
                         try {
-                            Thread.currentThread().sleep(3000);
+                            Thread.currentThread().sleep(2000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

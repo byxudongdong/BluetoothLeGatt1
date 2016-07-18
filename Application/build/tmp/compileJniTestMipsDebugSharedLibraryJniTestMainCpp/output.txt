@@ -3,10 +3,6 @@ compiling aesEnDecode.cpp successful.
 clang++.exe: warning: optimization flag '-finline-functions' is not supported
 clang++.exe: warning: argument unused during compilation: '-finline-functions'
 
-compiling AESENC.cpp successful.
-clang++.exe: warning: optimization flag '-finline-functions' is not supported
-clang++.exe: warning: argument unused during compilation: '-finline-functions'
-
 compiling file_parse.cpp successful.
 clang++.exe: warning: optimization flag '-finline-functions' is not supported
 clang++.exe: warning: argument unused during compilation: '-finline-functions'
@@ -14,6 +10,10 @@ H:\ProJ\BluetoothLeGatt1\Application\src\main\jni\file_parse.cpp:333:20: warning
         char* classname = "com/example/android/bluetoothlegatt/MyNative";
                           ^
 1 warning generated.
+
+compiling AESENC.cpp successful.
+clang++.exe: warning: optimization flag '-finline-functions' is not supported
+clang++.exe: warning: argument unused during compilation: '-finline-functions'
 
 compiling AES.cpp successful.
 clang++.exe: warning: optimization flag '-finline-functions' is not supported

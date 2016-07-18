@@ -226,7 +226,7 @@ public class BluetoothLeService extends Service {
 		Intent intent1 = new Intent(this, DeviceScanActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
 				intent1, 0);
-		notification.setLatestEventInfo(this, "优先级通知", "提高优先级", contentIntent);
+		//notification.setLatestEventInfo(this, "优先级通知", "提高优先级", contentIntent);
 		notification.flags = Notification.FLAG_AUTO_CANCEL; // 设置为点击后自动取消
 		startForeground(1235, notification);
 	}
