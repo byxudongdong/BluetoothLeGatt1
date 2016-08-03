@@ -320,10 +320,10 @@ JNIEXPORT jint JNICALL Java_com_example_android_bluetoothlegatt_MyNative_update_
 		//ppData = r11_updateImage[index].data;
 		memcpy(ppData, r11_updateImage[index].data, sizeof(r11_updateImage[index].data));
 	}
-	env->ReleaseByteArrayElements(ppVer_Str, (jbyte*)ppVerStr, JNI_COMMIT);
-	env->ReleaseByteArrayElements(pHw_Info, (jbyte*)pHwInfo, JNI_COMMIT);
-	env->ReleaseByteArrayElements(pImage_Size, (jbyte*)pImageSize, JNI_COMMIT);
-	env->ReleaseByteArrayElements(p_Crc, (jbyte*)pCrc, JNI_COMMIT);
+	env->ReleaseByteArrayElements(ppVer_Str, (jbyte*)ppVerStr, 0);
+	env->ReleaseByteArrayElements(pHw_Info, (jbyte*)pHwInfo, 0);
+	env->ReleaseByteArrayElements(pImage_Size, (jbyte*)pImageSize, 0);
+	env->ReleaseByteArrayElements(p_Crc, (jbyte*)pCrc, 0);
 	return 0;
 }
 

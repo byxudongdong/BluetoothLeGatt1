@@ -28,6 +28,8 @@
     PackageManager.hasSystemFeature(FEATURE_BLUETOOTH_LE) -->
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
@@ -41,13 +43,13 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.Holo.Light">
         <activity android:name=".DeviceScanActivity"
-            android:label="@string/app_name">
+            android:label="W16升级">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".DeviceControlActivity"/>
+        <activity android:name=".DeviceControlActivity" android:screenOrientation="landscape"/>
         <service android:name=".BluetoothLeService" android:enabled="true"/>
     </application>
 

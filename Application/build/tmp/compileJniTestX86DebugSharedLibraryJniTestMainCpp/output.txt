@@ -7,8 +7,8 @@ H:\ProJ\BluetoothLeGatt1\Application\src\main\jni\file_parse.cpp:333:20: warning
                           ^
 1 warning generated.
 
-compiling AES.cpp successful.
-
 compiling AESENC.cpp successful.
+
+compiling AES.cpp successful.
 
 Finished compileJniTestX86DebugSharedLibraryJniTestMainCpp, see full log file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/compileJniTestX86DebugSharedLibraryJniTestMainCpp/output.txt.

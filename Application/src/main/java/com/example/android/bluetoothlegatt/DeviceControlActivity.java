@@ -17,17 +17,25 @@
 package com.example.android.bluetoothlegatt;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.text.format.Time;
 import android.text.method.ScrollingMovementMethod;
@@ -40,15 +48,30 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.util.ByteArrayBuffer;
+import org.apache.http.util.EncodingUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -79,8 +102,8 @@ public class DeviceControlActivity extends Activity {
     Thread mthread;
     Boolean updateFlag = false;
     String newtime;
-    public Button upDateButton;
-    public EditText updateState;
+    public Button upDateButton,version;
+    public TextView updateState;
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
@@ -263,6 +286,7 @@ public class DeviceControlActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
@@ -277,9 +301,10 @@ public class DeviceControlActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
+        version = (Button) findViewById(R.id.version);
         upDateButton = (Button)findViewById(R.id.updateButton);
         myProgress = (MyProgress) findViewById(R.id.pgsBar);
-        updateState = (EditText) findViewById(R.id.updateState);
+        updateState = (TextView) findViewById(R.id.updateState);
         textView = (TextView)findViewById(R.id.textView);
 
         //textView.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -306,6 +331,7 @@ public class DeviceControlActivity extends Activity {
 
                     updateFlag = true;
                     mthread = new Thread(sendData, "Update");
+                    myNative.update_checkSetFlag(0);
                     mthread.start();
                 }
                 else
@@ -315,14 +341,20 @@ public class DeviceControlActivity extends Activity {
             }
         });
 
-        new Handler().postDelayed(new Runnable(){
-            public void run() {
-                //execute the task
-                getHw_version = true;
-                mRunnable.run();
-            }
-        }, 3000);
+//        new Handler().postDelayed(new Runnable(){
+//            public void run() {
+//                //execute the task
+//                getHw_version = true;
+//                mRunnable.run();
+//            }
+//        }, 3000);
 
+    }
+
+    public void version(View v)
+    {
+        getHw_version = true;
+        mRunnable.run();
     }
 
     Runnable mRunnable = new Runnable() {
@@ -348,7 +380,6 @@ public class DeviceControlActivity extends Activity {
     byte [] buffer = null;
     String fileName = "classes.dex";
 
-
     Runnable sendData = new Runnable()
     {
         @Override
@@ -367,7 +398,7 @@ public class DeviceControlActivity extends Activity {
                     +"-"+String.format("%02d",date);
             //读SD中的文件
             try{
-                String filePath = updateOpt.getSdCardPath() + "/image_W16_15_20160606_c.hyc";
+                String filePath = updateOpt.getSdCardPath() + "/Download/image_W16.hyc";
                 try {
                     imageNum = myNative.update_fileParse(filePath.getBytes());
                 }catch (Exception  e) {
@@ -511,7 +542,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 800)
+                if ((consumingTime - startTime) >= 400)
                 {
 			        /* 超时重发 */
                     Log.i("发送升级文件：", "超时重发");
@@ -555,19 +586,26 @@ public class DeviceControlActivity extends Activity {
                     //Toast.makeText(getApplicationContext(), "收到回应", Toast.LENGTH_SHORT).show();
                     //receiveDataFlag = true;
                     updateState.setText("收到回应");
-
 //                    synchronized(object)
 //                    {
 //                        Log.i("解锁通知：", "wait...");
 //                        object.notify(); // 恢复线程
 //                    }
-
                     break;
                 case 2:
                     updateState.setText("发送升级请求");
                     break;
                 case 6:
                     Toast.makeText(getApplicationContext(), "请确认升级文件存在根目录？", Toast.LENGTH_LONG).show();
+                    break;
+                case 8:
+                    showSingleChoiceButton();
+                    break;
+                case 9:
+                    updateState.setText("升级成功！！！");
+                    break;
+                case 41:
+                    new Thread(runnable,"GetFiles").start();
                     break;
             }
         }
@@ -616,10 +654,12 @@ public class DeviceControlActivity extends Activity {
         if (mConnected) {
             menu.findItem(R.id.menu_connect).setVisible(false);
             menu.findItem(R.id.menu_disconnect).setVisible(true);
+            upDateButton.setClickable(true);
         } else {
             menu.findItem(R.id.menu_connect).setVisible(true);
             menu.findItem(R.id.menu_disconnect).setVisible(false);
         }
+
         return true;
     }
 
@@ -635,9 +675,23 @@ public class DeviceControlActivity extends Activity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.menu_files:
+                sendMessage(41);
+                return true;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    Runnable runnable=new Runnable() {
+        @Override
+        public void run() {
+            load();
+            Looper.prepare();
+            sendMessage(8);
+        }
+    };
 
     private void updateConnectionState(final int resourceId) {
         runOnUiThread(new Runnable() {
@@ -1017,7 +1071,7 @@ public class DeviceControlActivity extends Activity {
                     if (pdata[offset] == UPDATE_REJECT_REASON_HW_ERR)
                     {
 				        /* 硬件版本错误 */
-                        Log.i("硬件版本错误....","重新发送升级请求");
+                        Log.i("硬件版本错误0....","重新发送升级请求");
                         imageIndex++;
                         if (imageIndex >= imageNum) imageIndex = 0;
                     }
@@ -1045,7 +1099,7 @@ public class DeviceControlActivity extends Activity {
                         update_step++;
                         if (len > 3)
                         {
-                            Log.i("芯片支持OAD....","芯片支持OAD");
+                            Log.i("芯片支持OAD0....","芯片支持OAD");
                             supportCipher = true;
                         }
                         else
@@ -1057,7 +1111,7 @@ public class DeviceControlActivity extends Activity {
                         break;
                     case UPDATE_REJECT_REASON_HW_ERR:
 			        /* 硬件版本错误 */
-                        Log.i("硬件版本错误....","硬件版本错误");
+                        Log.i("硬件版本错误1....","硬件版本错误");
                         imageIndex++;
                         if (imageIndex >= imageNum) imageIndex = 0;
                         ret = myNative.update_getImageInfo(imageIndex,Update_info.ppVer_Str,
@@ -1082,6 +1136,7 @@ public class DeviceControlActivity extends Activity {
                     //mySetRecvInfo("CRC校验正确");
                     Log.i("CRC校验正确","CRC校验正确");
                     update_step = UPDATE_STEP_CRC_RES_RECV;
+                    sendMessage(9);
                 }
                 else
                 {
@@ -1118,5 +1173,137 @@ public class DeviceControlActivity extends Activity {
         }
 
     }
+
+    private String[] province = new String[] { "上海", "北京", "湖南", "湖北", "海南" };
+    // 单击事件对象的实例
+    private ButtonOnClick buttonOnClick = new ButtonOnClick(1);
+    // 在单选选项中显示 确定和取消按钮
+    //buttonOnClickg变量的数据类型是ButtonOnClick,一个单击事件类
+    private void showSingleChoiceButton()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("请选择升级文件版本");
+        builder.setSingleChoiceItems(province, 0, buttonOnClick);
+        builder.setPositiveButton("确定", buttonOnClick);
+        builder.setNegativeButton("取消", buttonOnClick);
+        builder.show();
+    }
+
+    private class ButtonOnClick implements DialogInterface.OnClickListener
+    {
+
+        private int index; // 表示选项的索引
+
+        public ButtonOnClick(int index)
+        {
+            this.index = index;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            // which表示单击的按钮索引，所有的选项索引都是大于0，按钮索引都是小于0的。
+            if (which >= 0)
+            {
+                //如果单击的是列表项，将当前列表项的索引保存在index中。
+                //如果想单击列表项后关闭对话框，可在此处调用dialog.cancel()
+                //或是用dialog.dismiss()方法。
+                index = which;
+            }
+            else
+            {
+                //用户单击的是【确定】按钮
+                if (which == DialogInterface.BUTTON_POSITIVE)
+                {
+                    //显示用户选择的是第几个列表项。
+                    final AlertDialog ad = new AlertDialog.Builder(
+                            DeviceControlActivity.this).setMessage(
+                            "你选择的文件是：" + index + ":" + province[index]).show();
+                    //五秒钟后自动关闭。
+                    Handler hander = new Handler();
+                    Runnable runnable = new Runnable()
+                    {
+
+                        @Override
+                        public void run()
+                        {
+                            ad.dismiss();
+                        }
+                    };
+                    hander.postDelayed(runnable, 2 * 1000);
+                    //TODO
+                }
+                //用户单击的是【取消】按钮
+                else if (which == DialogInterface.BUTTON_NEGATIVE)
+                {
+                    Toast.makeText(DeviceControlActivity.this, "你没有选择任何文件！",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    Document doc;
+    List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+    protected void load() {
+
+        try {
+            doc = Jsoup.parse(new URL("http://192.168.8.135/Images/"), 5000);
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+        //Elements es = doc.getElementsByClass("a");
+        Elements links = doc.select("a[href]"); // 具有 href 属性的链接
+        list.clear();
+        for (Element e : links) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("title", e.getElementsByTag("a").text());
+            map.put("href", "http://192.168.8.135/Images/"
+                    + e.getElementsByTag("a").attr("href"));
+            if(e.getElementsByTag("a").text().contains(".hyc")) {
+                list.add(map);
+            }
+        }
+
+        province = new String[] { list.get(0).get("title"),list.get(1).get("title") };
+//        ListView listView = (ListView) findViewById(R.id.listView1);
+//        listView.setAdapter(new SimpleAdapter(this, list, android.R.layout.simple_list_item_2,
+//                new String[] { "title","href" }, new int[] {
+//                android.R.id.text1,android.R.id.text2
+//        }));
+
+    }
+
+    /**
+     * @param urlString
+     * @return
+     */
+    public String getHtmlString(String urlString) {
+        try {
+            URL url = null;
+            url = new URL(urlString);
+
+            URLConnection ucon = null;
+            ucon = url.openConnection();
+
+            InputStream instr = null;
+            instr = ucon.getInputStream();
+
+            BufferedInputStream bis = new BufferedInputStream(instr);
+
+            ByteArrayBuffer baf = new ByteArrayBuffer(500);
+            int current = 0;
+            while ((current = bis.read()) != -1) {
+                baf.append((byte) current);
+            }
+            return EncodingUtils.getString(baf.toByteArray(), "gbk");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 
 }

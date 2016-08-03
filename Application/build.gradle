@@ -1,17 +1,20 @@
 apply plugin: 'com.android.model.application'
-
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
 model {
     android {
-        compileSdkVersion = 23
-        buildToolsVersion = '23.0.2'
+        compileSdkVersion = 21
+        buildToolsVersion = '23.0.3'
 
         defaultConfig {
             applicationId    = 'com.example.android.bluetoothlegatt'
             minSdkVersion.apiLevel    = 18
             targetSdkVersion.apiLevel = 20
         }
+
         ndk {
-            platformVersion = 21
+            platformVersion = 23
             moduleName = 'JniTest'
             toolchain = 'clang'
             CFlags.add('-std=c99')
@@ -30,5 +33,6 @@ model {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:support-v4:21.0.0'
+    compile files('src/main/libs/jsoup-1.7.2.jar')
 }
