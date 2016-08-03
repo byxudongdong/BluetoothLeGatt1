@@ -18,27 +18,22 @@ package com.example.android.bluetoothlegatt;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.text.format.Time;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -46,28 +41,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.util.ByteArrayBuffer;
-import org.apache.http.util.EncodingUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -315,6 +311,12 @@ public class DeviceControlActivity extends Activity {
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        if (mBluetoothLeService != null) {
+            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            Log.d(TAG, "Connect request result=" + result);
+        }
+
         upDateButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -399,14 +401,21 @@ public class DeviceControlActivity extends Activity {
             //读SD中的文件
             try{
                 String filePath = updateOpt.getSdCardPath() + "/Download/image_W16.hyc";
-                try {
-                    imageNum = myNative.update_fileParse(filePath.getBytes());
-                }catch (Exception  e) {
-                    Log.i("升级文件不存在：", "请放入升级文件");
-                    sendMessage(6);
+                int retry =6;
+                while(imageNum <1) {
+                    try {
+                        imageNum = myNative.update_fileParse(filePath.getBytes());
+                    } catch (Exception e) {
+                        Log.i("升级文件不存在：", "请放入升级文件");
+                        sendMessage(6);
+                    }
+                    if(imageNum >0) break;
+                    retry --;
+                    if(retry == 0){
+                        Log.i("升级文件个数", String.valueOf(imageNum));
+                        break;
+                    }
                 }
-
-                Log.i("升级文件个数",String.valueOf(imageNum));
 
                 fin = new FileInputStream(filePath);
                 int filedataLenTotal = fin.available();
@@ -598,11 +607,17 @@ public class DeviceControlActivity extends Activity {
                 case 6:
                     Toast.makeText(getApplicationContext(), "请确认升级文件存在根目录？", Toast.LENGTH_LONG).show();
                     break;
+                case 7:
+                    Toast.makeText(getApplicationContext(), "请确认网络连接？", Toast.LENGTH_LONG).show();
                 case 8:
-                    showSingleChoiceButton();
+                    if(!list.isEmpty())
+                        showSingleChoiceButton();
                     break;
                 case 9:
                     updateState.setText("升级成功！！！");
+                    break;
+                case 11:
+                    new Thread(httpdownload,"Download").start();
                     break;
                 case 41:
                     new Thread(runnable,"GetFiles").start();
@@ -614,22 +629,23 @@ public class DeviceControlActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.d(TAG, "Connect request result=" + result);
-        }
+//        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+//        if (mBluetoothLeService != null) {
+//            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+//            Log.d(TAG, "Connect request result=" + result);
+//        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mGattUpdateReceiver);
         unbindService(mServiceConnection);
         mBluetoothLeService.disconnect();
         mBluetoothLeService.close();
@@ -643,6 +659,7 @@ public class DeviceControlActivity extends Activity {
                 && event.getRepeatCount() == 0) {
             //do something...
             finish();
+            //moveTaskToBack(false);
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -676,6 +693,7 @@ public class DeviceControlActivity extends Activity {
                 onBackPressed();
                 return true;
             case R.id.menu_files:
+
                 sendMessage(41);
                 return true;
             default:
@@ -687,9 +705,17 @@ public class DeviceControlActivity extends Activity {
     Runnable runnable=new Runnable() {
         @Override
         public void run() {
-            load();
+            loads();
             Looper.prepare();
             sendMessage(8);
+        }
+    };
+
+    Runnable httpdownload =new Runnable() {
+        @Override
+        public void run() {
+            downloadfile( list.get(index).get("Url"));
+            Looper.prepare();
         }
     };
 
@@ -1174,7 +1200,7 @@ public class DeviceControlActivity extends Activity {
 
     }
 
-    private String[] province = new String[] { "上海", "北京", "湖南", "湖北", "海南" };
+    private String[] province = new String[] { "上海", "北京", "海南" };
     // 单击事件对象的实例
     private ButtonOnClick buttonOnClick = new ButtonOnClick(1);
     // 在单选选项中显示 确定和取消按钮
@@ -1183,20 +1209,19 @@ public class DeviceControlActivity extends Activity {
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("请选择升级文件版本");
-        builder.setSingleChoiceItems(province, 0, buttonOnClick);
+        builder.setSingleChoiceItems(province, -1, buttonOnClick);
         builder.setPositiveButton("确定", buttonOnClick);
         builder.setNegativeButton("取消", buttonOnClick);
         builder.show();
     }
 
+    public int index; // 表示选项的索引
     private class ButtonOnClick implements DialogInterface.OnClickListener
     {
 
-        private int index; // 表示选项的索引
-
-        public ButtonOnClick(int index)
+        public ButtonOnClick(int listindex)
         {
-            this.index = index;
+            index = listindex;
         }
 
         @Override
@@ -1216,14 +1241,15 @@ public class DeviceControlActivity extends Activity {
                 if (which == DialogInterface.BUTTON_POSITIVE)
                 {
                     //显示用户选择的是第几个列表项。
+                    Log.w("选择的文件是：",province[index]);
                     final AlertDialog ad = new AlertDialog.Builder(
                             DeviceControlActivity.this).setMessage(
                             "你选择的文件是：" + index + ":" + province[index]).show();
+                    sendMessage(11);
                     //五秒钟后自动关闭。
                     Handler hander = new Handler();
                     Runnable runnable = new Runnable()
                     {
-
                         @Override
                         public void run()
                         {
@@ -1232,6 +1258,7 @@ public class DeviceControlActivity extends Activity {
                     };
                     hander.postDelayed(runnable, 2 * 1000);
                     //TODO
+//                    downloadfile(province[index] );
                 }
                 //用户单击的是【取消】按钮
                 else if (which == DialogInterface.BUTTON_NEGATIVE)
@@ -1244,17 +1271,20 @@ public class DeviceControlActivity extends Activity {
     }
 
     Document doc;
+    String Url = "http://hycosoft.cc/w16.json";
     List<Map<String, String>> list = new ArrayList<Map<String, String>>();
     protected void load() {
-
         try {
-            doc = Jsoup.parse(new URL("http://192.168.8.135/Images/"), 5000);
+            doc = Jsoup.parse(new URL("http://192.168.8.135/Images/"), 3000);
         } catch (MalformedURLException e1) {
             e1.printStackTrace();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
+        if(doc == null){
+            sendMessage(7);
+            return;
+        }
         //Elements es = doc.getElementsByClass("a");
         Elements links = doc.select("a[href]"); // 具有 href 属性的链接
         list.clear();
@@ -1267,43 +1297,95 @@ public class DeviceControlActivity extends Activity {
                 list.add(map);
             }
         }
-
         province = new String[] { list.get(0).get("title"),list.get(1).get("title") };
-//        ListView listView = (ListView) findViewById(R.id.listView1);
-//        listView.setAdapter(new SimpleAdapter(this, list, android.R.layout.simple_list_item_2,
-//                new String[] { "title","href" }, new int[] {
-//                android.R.id.text1,android.R.id.text2
-//        }));
+
+    }
+
+    protected void loads() {
+        String getdata = HttpUser.getJsonContent(Url);  //请求数据地址
+        if(getdata == null){
+            sendMessage(7);
+            return;
+        }
+        //JSON对象 转 JSONModel对象
+        Root result = JavaBean.getPerson(getdata, Root.class);
+        list.clear();
+        for (int i=0;i<result.getKey().size();i++) {{
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("Name", result.getKey().get(i).getName());
+            map.put("Url", result.getKey().get(i).getUrl() );
+            list.add(map);
+            }
+        }
+        province = new String[result.getKey().size()];
+        for(int j=0;j<result.getKey().size();j++)
+        {
+            province[j] = list.get(j).get("Name");
+        }
 
     }
 
     /**
-     * @param urlString
-     * @return
+     *
+     * @Project: Android_MyDownload
+     * @Desciption: 读取任意文件，并将文件保存到手机SDCard
+     * @Author: LinYiSong
+     * @Date: 2011-3-25~2011-3-25
      */
-    public String getHtmlString(String urlString) {
-        try {
-            URL url = null;
-            url = new URL(urlString);
+        public void downloadfile(String  urlStr)
+        {
+            String path="Download";
+            String fileName="image_W16.hyc";
+            OutputStream output=null;
+            try {
+                /*
+                 * 通过URL取得HttpURLConnection
+                 * 要网络连接成功，需在AndroidMainfest.xml中进行权限配置
+                 * <uses-permission android:name="android.permission.INTERNET" />
+                 */
+                URL url=new URL( urlStr);
+                HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+                //取得inputStream，并将流中的信息写入SDCard
+                String SDCard= Environment.getExternalStorageDirectory()+"";
+                String pathName=SDCard+"/"+path+"/"+fileName;//文件存储路径
 
-            URLConnection ucon = null;
-            ucon = url.openConnection();
-
-            InputStream instr = null;
-            instr = ucon.getInputStream();
-
-            BufferedInputStream bis = new BufferedInputStream(instr);
-
-            ByteArrayBuffer baf = new ByteArrayBuffer(500);
-            int current = 0;
-            while ((current = bis.read()) != -1) {
-                baf.append((byte) current);
+                File file=new File(pathName);
+                InputStream input=conn.getInputStream();
+                if(file.exists()){
+                    System.out.println("exits");
+                    file.delete();
+                }else{
+                    String dir=SDCard+"/"+path;
+                    new File(dir).mkdir();//新建文件夹
+                    file.createNewFile();//新建文件
+                    output=new FileOutputStream(file);
+                    //读取大文件
+                    byte[] buffer=new byte[128];
+                    Log.w("文件请求大小",String.valueOf(input.available()));
+                    while(input.read(buffer)!=-1){
+                        output.write(buffer);
+                    }
+                    output.flush();
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally{
+                try {
+                    if(output != null) {
+                        output.close();
+                        System.out.println("success");
+                    }else {
+                        System.out.println("fail");
+                        sendMessage(11);
+                    }
+                } catch (IOException e) {
+                    System.out.println("fail");
+                    e.printStackTrace();
+                }
             }
-            return EncodingUtils.getString(baf.toByteArray(), "gbk");
-        } catch (Exception e) {
-            return "";
         }
-    }
 
 
 }

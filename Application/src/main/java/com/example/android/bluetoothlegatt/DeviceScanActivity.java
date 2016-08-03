@@ -88,6 +88,8 @@ public class DeviceScanActivity extends ListActivity {
             return;
         }
 
+        //List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
+        //Set<BluetoothDevice> devices = mBluetoothAdapter.getBondedDevices();
         List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         if (devices.size()>0) {
             for(Iterator<BluetoothDevice> iterator = devices.iterator(); iterator.hasNext();){
