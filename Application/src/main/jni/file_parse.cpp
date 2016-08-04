@@ -158,7 +158,7 @@ JNIEXPORT jint JNICALL Java_com_example_android_bluetoothlegatt_MyNative_update_
 		}
 
 		/* 4. 判断升级数据大小 */
-		if (pHeader->imageSize < R11_IMAGE_SIZE_MIN || pHeader->imageSize > R11_IMAGE_SIZE_MAX)
+		if ( (pHeader->imageSize < R11_IMAGE_SIZE_MIN) || (pHeader->imageSize > R11_IMAGE_SIZE_MAX) )
 		{
 			/* 升级数据大小错误，不再继续查找 */
 			LOGI("升级数据大小错误，不再继续查找 ");

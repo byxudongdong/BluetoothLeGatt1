@@ -392,15 +392,13 @@ public class DeviceControlActivity extends Activity {
             int year = t.year;
             int month = t.month + 1;
             int date = t.monthDay;
-//    		int hour = t.hour; // 0-23
-//    		int minute = t.minute;
-//    		int second = t.second;
+
             newtime = String.valueOf(year)
                     +"-"+String.format("%02d",month)
                     +"-"+String.format("%02d",date);
             //读SD中的文件
             try{
-                String filePath = updateOpt.getSdCardPath() + "/Download/image_W16.hyc";
+                String filePath = updateOpt.getSdCardPath() + "/Downloads/image_W16.hyc";
                 int retry =6;
                 while(imageNum <1) {
                     try {
@@ -420,6 +418,13 @@ public class DeviceControlActivity extends Activity {
                 fin = new FileInputStream(filePath);
                 int filedataLenTotal = fin.available();
                 Log.i("文件字节数",String.valueOf(filedataLenTotal));
+                if(imageNum >0) {
+                    try {
+                        fin.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 buffer = new byte[98];
             } catch(Exception e){
                 e.printStackTrace();
@@ -485,13 +490,6 @@ public class DeviceControlActivity extends Activity {
                 }
             }
 
-            if(imageNum >0) {
-                try {
-                    fin.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
             Log.i("使能按键：", "wait...");
             update_step = 0;
             upDateButton.setClickable(true);
@@ -655,8 +653,7 @@ public class DeviceControlActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if (keyCode == KeyEvent.KEYCODE_BACK
-                && event.getRepeatCount() == 0) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             //do something...
             finish();
             //moveTaskToBack(false);
@@ -1334,7 +1331,7 @@ public class DeviceControlActivity extends Activity {
      */
         public void downloadfile(String  urlStr)
         {
-            String path="Download";
+            String path="Downloads";
             String fileName="image_W16.hyc";
             OutputStream output=null;
             try {
