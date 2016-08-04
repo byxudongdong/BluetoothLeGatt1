@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.bluetoothlegatt;
 
 import android.app.Activity;
@@ -46,9 +45,6 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -60,7 +56,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -78,7 +73,7 @@ import java.util.UUID;
  */
 public class DeviceControlActivity extends Activity {
     private MyProgress myProgress = null;
-    private Handler mHandler;
+    //private Handler mHandler;
     Boolean getHw_version = false;
     byte[][] Hw_version = new byte[6][64];
     int HW_index = 0;
@@ -94,7 +89,7 @@ public class DeviceControlActivity extends Activity {
     public static Boolean WriteCharacterRspFlag = false;
 
     UpdateOpt updateOpt = new UpdateOpt();
-    public static Object object = new Object();
+    //public static Object object = new Object();
     Thread mthread;
     Boolean updateFlag = false;
     String newtime;
@@ -120,8 +115,8 @@ public class DeviceControlActivity extends Activity {
 
     public static BluetoothGattService mnotyGattService;
     public static BluetoothGattCharacteristic writecharacteristic;
-    public static BluetoothGattService readMnotyGattService;
-    public static BluetoothGattCharacteristic readCharacteristic;
+//    public static BluetoothGattService readMnotyGattService;
+//    public static BluetoothGattCharacteristic readCharacteristic;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -355,8 +350,12 @@ public class DeviceControlActivity extends Activity {
 
     public void version(View v)
     {
-        getHw_version = true;
-        mRunnable.run();
+        if(mConnected) {
+            getHw_version = true;
+            mRunnable.run();
+        }else{
+            sendMessage(5);
+        }
     }
 
     Runnable mRunnable = new Runnable() {
@@ -602,6 +601,9 @@ public class DeviceControlActivity extends Activity {
                 case 2:
                     updateState.setText("发送升级请求");
                     break;
+                case 5:
+                    Toast.makeText(getApplicationContext(), "请确认蓝牙连接状态？", Toast.LENGTH_LONG).show();
+                    break;
                 case 6:
                     Toast.makeText(getApplicationContext(), "请确认升级文件存在根目录？", Toast.LENGTH_LONG).show();
                     break;
@@ -807,7 +809,7 @@ public class DeviceControlActivity extends Activity {
         String res="";
         byte [] buffer = null;
         try{
-            FileInputStream fin = new FileInputStream(updateOpt.getSdCardPath() + fileName);
+            FileInputStream fin = new FileInputStream(UpdateOpt.getSdCardPath() + fileName);
             int length = fin.available();
             buffer = new byte[length];
             fin.read(buffer);
@@ -864,36 +866,36 @@ public class DeviceControlActivity extends Activity {
     byte	COMM_TRANS_TYPE_SEND		=	(0x53);	/* 'S'---send */
     byte	COMM_TRANS_TYPE_RESP		=	(0x52);	/* 'R'---response */
 /* 命令类型 */
-    byte	COMM_CMD_TYPE_BARCODE		=	(0x01);	//条码传输
-    byte	COMM_CMD_TYPE_BUTTON		=	(0x02);	//滑动按键，保留
-    byte	COMM_CMD_TYPE_RESEVE0		=	(0x03);	//保留
-    byte	COMM_CMD_TYPE_LED			=	(0x04);	//控制led(Simple)
-    byte	COMM_CMD_TYPE_LED_ADV		=	(0x05);	//控制led(Advanced)
-    byte	COMM_CMD_TYPE_BT_NAME		=	(0x06);	//蓝牙名称设置
-    byte	COMM_CMD_TYPE_SUFFIX		=	(0x07);	//条码后缀设置
+//    byte	COMM_CMD_TYPE_BARCODE		=	(0x01);	//条码传输
+//    byte	COMM_CMD_TYPE_BUTTON		=	(0x02);	//滑动按键，保留
+//    byte	COMM_CMD_TYPE_RESEVE0		=	(0x03);	//保留
+//    byte	COMM_CMD_TYPE_LED			=	(0x04);	//控制led(Simple)
+//    byte	COMM_CMD_TYPE_LED_ADV		=	(0x05);	//控制led(Advanced)
+//    byte	COMM_CMD_TYPE_BT_NAME		=	(0x06);	//蓝牙名称设置
+//    byte	COMM_CMD_TYPE_SUFFIX		=	(0x07);	//条码后缀设置
 //byte	COMM_CMD_TYPE_BAR_PRIOR		=	(0x08);	//条码解码优先级设置
 //byte	COMM_CMD_TYPE_BAR_PARAM		=	(0x09);	//条码解码参数设置
-    byte	COMM_CMD_TYPE_BT_STA	=		(0x0A);	//BT连接状态报告
-    byte	COMM_CMD_TYPE_BAT_LEV		=	(0x0A);	//电量获取
-    byte	COMM_CMD_TYPE_CONNECT_STA	=	(0x0B);	//连接状态查询
-    byte	COMM_CMD_TYPE_RSSI		    =    (0x0C);	//获取本地蓝牙的RSSI
-    byte	COMM_CMD_TYPE_SCAN_MODE		=	(0x0E);	//扫描模式设置
-    byte	COMM_CMD_TYPE_RD_BAR_PRIOR	=	(0x10);	//读取条码解码优先级
-    byte	COMM_CMD_TYPE_WR_BAR_PRIOR	=	(0x11);	//设置条码解码优先级
-    byte	COMM_CMD_TYPE_RD_BAR_PARAM	=	(0x12);	//读取条码解码参数
-    byte	COMM_CMD_TYPE_WR_BAR_PARAM	=	(0x13);	//设置条码解码参数
-    byte   COMM_CMD_TYPE_DEBUG_EN		=(byte)	(0xB0);	//debug开关
-    byte   COMM_CMD_TYPE_DEBUG_SCAN	    =(byte)	(0xB1);	//debug scan开关
-    byte	COMM_CMD_TYPE_WR_STAY_COMM   =(byte)	(0xC0);	//座充保持COMM模式
-    byte	COMM_CMD_TYPE_WR_IN_USB		=(byte)	(0xC1);	//座充进入U盘模式
+//    byte	COMM_CMD_TYPE_BT_STA	=		(0x0A);	//BT连接状态报告
+//    byte	COMM_CMD_TYPE_BAT_LEV		=	(0x0A);	//电量获取
+//    byte	COMM_CMD_TYPE_CONNECT_STA	=	(0x0B);	//连接状态查询
+//    byte	COMM_CMD_TYPE_RSSI		    =    (0x0C);	//获取本地蓝牙的RSSI
+//    byte	COMM_CMD_TYPE_SCAN_MODE		=	(0x0E);	//扫描模式设置
+//    byte	COMM_CMD_TYPE_RD_BAR_PRIOR	=	(0x10);	//读取条码解码优先级
+//    byte	COMM_CMD_TYPE_WR_BAR_PRIOR	=	(0x11);	//设置条码解码优先级
+//    byte	COMM_CMD_TYPE_RD_BAR_PARAM	=	(0x12);	//读取条码解码参数
+//    byte	COMM_CMD_TYPE_WR_BAR_PARAM	=	(0x13);	//设置条码解码参数
+//    byte   COMM_CMD_TYPE_DEBUG_EN		=(byte)	(0xB0);	//debug开关
+//    byte   COMM_CMD_TYPE_DEBUG_SCAN	    =(byte)	(0xB1);	//debug scan开关
+//    byte	COMM_CMD_TYPE_WR_STAY_COMM   =(byte)	(0xC0);	//座充保持COMM模式
+//    byte	COMM_CMD_TYPE_WR_IN_USB		=(byte)	(0xC1);	//座充进入U盘模式
     byte	COMM_CMD_TYPE_UPDATE		=(byte)	(0xD0);	//软件升级
-    byte	COMM_CMD_TYPE_VOICE		=(byte)	(0xD1);	//语音数据传输
-    byte	COMM_CMD_TYPE_DONGLE_SN	=(byte)	(0xD2);	//dongle序列号z
-    byte	COMM_CMD_TYPE_TOUCH		=	(byte)0xDF;	//touch数据
+//    byte	COMM_CMD_TYPE_VOICE		=(byte)	(0xD1);	//语音数据传输
+//    byte	COMM_CMD_TYPE_DONGLE_SN	=(byte)	(0xD2);	//dongle序列号z
+//    byte	COMM_CMD_TYPE_TOUCH		=	(byte)0xDF;	//touch数据
     byte	COMM_CMD_TYPE_VERSION		=	(byte)(0xE0);	//R11版本信息
 /* 封包最小长度 */
-    int	    COMM_PAKET_LEN_MIN	=	(6);
-    int 	COMM_DATA_BUF_LEN	    =	(1024);
+//    int	    COMM_PAKET_LEN_MIN	=	(6);
+//    int 	COMM_DATA_BUF_LEN	    =	(1024);
     int     UPDATE_SEND_PAKET_SIZE  = 92;
 
     //final int UPDATE_REQUEST_ID		=	(int)(0xFFFD);
@@ -1114,7 +1116,7 @@ public class DeviceControlActivity extends Activity {
 			        /* 升级请求被接受 */
                         Log.i("请求被接收....","请求被接收");
                         try {
-                            Thread.currentThread().sleep(2000);
+                            Thread.currentThread().sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -1340,6 +1342,7 @@ public class DeviceControlActivity extends Activity {
                  * 要网络连接成功，需在AndroidMainfest.xml中进行权限配置
                  * <uses-permission android:name="android.permission.INTERNET" />
                  */
+                //urlStr = null;
                 URL url=new URL( urlStr);
                 HttpURLConnection conn=(HttpURLConnection)url.openConnection();
                 //获得文件的长度
@@ -1347,6 +1350,7 @@ public class DeviceControlActivity extends Activity {
                 System.out.println("长度 :"+contentLength);
 
                 //取得inputStream，并将流中的信息写入SDCard
+                //String SDCard= Environment.getExternalStorageDirectory()+"";
                 String SDCard= Environment.getExternalStorageDirectory()+"";
                 String pathName=SDCard+"/"+path+"/"+fileName;//文件存储路径
 
@@ -1363,7 +1367,7 @@ public class DeviceControlActivity extends Activity {
                     //读取大文件
                     byte[] buffer=new byte[1024];
                     //Log.w("文件请求大小",String.valueOf(input.available()));
-                    int len;
+                    int len;            //重要参数
                     while( (len = input.read(buffer))!=-1 ){
                         output.write(buffer,0,len);
                     }
