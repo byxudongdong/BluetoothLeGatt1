@@ -404,7 +404,7 @@ public class DeviceControlActivity extends Activity {
                     try {
                         imageNum = myNative.update_fileParse(filePath.getBytes());
                     } catch (Exception e) {
-                        Log.i("升级文件不存在：", "请放入升级文件");
+                        Log.w("升级文件不存在：", "请放入升级文件");
                         sendMessage(6);
                     }
                     if(imageNum >0) break;
@@ -1094,7 +1094,7 @@ public class DeviceControlActivity extends Activity {
                     if (pdata[offset] == UPDATE_REJECT_REASON_HW_ERR)
                     {
 				        /* 硬件版本错误 */
-                        Log.i("硬件版本错误0....","重新发送升级请求");
+                        Log.w("硬件版本错误0....","重新发送升级请求");
                         imageIndex++;
                         if (imageIndex >= imageNum) imageIndex = 0;
                     }
@@ -1127,7 +1127,7 @@ public class DeviceControlActivity extends Activity {
                         }
                         else
                         {
-                            Log.i("不支持OAD....","");
+                            Log.w("不支持OAD....","");
                             supportCipher = false;
                         }
 
@@ -1164,7 +1164,7 @@ public class DeviceControlActivity extends Activity {
                 else
                 {
 			        /* 校验值错误，重发升级请求，重新升级 */
-                    Log.i("校验值错误，重发升级请求，重新升级","校验值错误");
+                    Log.w("校验值错误，重发升级请求，重新升级","校验值错误");
                     update_step = UPDATE_STEP_SEND_REQUEST;
                     update_sendSize = 0;
 
@@ -1342,6 +1342,10 @@ public class DeviceControlActivity extends Activity {
                  */
                 URL url=new URL( urlStr);
                 HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+                //获得文件的长度
+                int contentLength = conn.getContentLength();
+                System.out.println("长度 :"+contentLength);
+
                 //取得inputStream，并将流中的信息写入SDCard
                 String SDCard= Environment.getExternalStorageDirectory()+"";
                 String pathName=SDCard+"/"+path+"/"+fileName;//文件存储路径
@@ -1357,12 +1361,14 @@ public class DeviceControlActivity extends Activity {
                     file.createNewFile();//新建文件
                     output=new FileOutputStream(file);
                     //读取大文件
-                    byte[] buffer=new byte[128];
-                    Log.w("文件请求大小",String.valueOf(input.available()));
-                    while(input.read(buffer)!=-1){
-                        output.write(buffer);
+                    byte[] buffer=new byte[1024];
+                    //Log.w("文件请求大小",String.valueOf(input.available()));
+                    int len;
+                    while( (len = input.read(buffer))!=-1 ){
+                        output.write(buffer,0,len);
                     }
                     output.flush();
+                    input.close();
                 }
             } catch (MalformedURLException e) {
                 e.printStackTrace();
