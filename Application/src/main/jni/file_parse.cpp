@@ -241,7 +241,7 @@ JNIEXPORT jint JNICALL Java_com_example_android_bluetoothlegatt_MyNative_update_
 		return -2;
 	}
 
-	if (update_flag == 0)
+	if (update_flag == 2)
 	{
 		/* 获取指定信息 */
 		LOGI("升级标志0，清空所有数据");

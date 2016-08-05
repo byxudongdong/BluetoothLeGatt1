@@ -397,7 +397,7 @@ public class DeviceControlActivity extends Activity {
                     +"-"+String.format("%02d",date);
             //读SD中的文件
             try{
-                String filePath = updateOpt.getSdCardPath() + "/Downloads/image_W16.hyc";
+                String filePath = UpdateOpt.getSdCardPath() + "/Downloads/image_W16.hyc";
                 int retry =6;
                 while(imageNum <1) {
                     try {
@@ -416,7 +416,7 @@ public class DeviceControlActivity extends Activity {
 
                 fin = new FileInputStream(filePath);
                 int filedataLenTotal = fin.available();
-                Log.i("文件字节数",String.valueOf(filedataLenTotal));
+                Log.i("文件字节数",String.valueOf(filedataLenTotal)+":"+String.valueOf(imageNum));
                 if(imageNum >0) {
                     try {
                         fin.close();
@@ -449,7 +449,17 @@ public class DeviceControlActivity extends Activity {
                         Update_info.image_size,
                         Update_info.image_crc,
                         Update_info.image_data);
-                while (updateFlag) {
+                if(Update_info.hw_info[0] == 0x00) {
+                    sendMessage(3);
+                    myNative.update_checkSetFlag(0);
+                    int ret1 = myNative.update_getImageInfo(imageIndex, Update_info.ppVer_Str,
+                            Update_info.hw_info,
+                            Update_info.image_size,
+                            Update_info.image_crc,
+                            Update_info.image_data);
+                }
+                update_step = 0;
+                while (updateFlag && Update_info.hw_info[0] != 0x00 && mConnected) {
                     //发送唤醒
                     if (update_step == 0) {
                         Log.i("唤醒蓝牙：", "wait...");
@@ -459,6 +469,14 @@ public class DeviceControlActivity extends Activity {
                         } catch (InterruptedException e) {
                             Log.i("等待延时：", "wait...");
                         }
+                    }
+                    if(Update_info.image_size[0] == 0 &&
+                        Update_info.image_size[1] == 0 &&
+                        Update_info.image_size[2] == 0 &&
+                        Update_info.image_size[3] == 0)
+                    {
+                        sendMessage(4);
+                        break;
                     }
                     //Log.i("升级流程切换：", "wait...");
                     update_step = update_Switch();
@@ -521,7 +539,7 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepSendImage:
                 Log.i("发送升级文件：", "发送升级文件"+String.valueOf(update_sendSize)
                                                     + ":"+String.valueOf(filedataLen) );
-                sendMessage( 3 );
+                //sendMessage( 3 );
                 /* 发送升级数据 */
                 if( update_sendSize >= filedataLen) {
                     update_step = UPDATE_STEP_WAIT_CRC_RES;
@@ -600,6 +618,12 @@ public class DeviceControlActivity extends Activity {
                     break;
                 case 2:
                     updateState.setText("发送升级请求");
+                    break;
+                case 3:
+                    Toast.makeText(getApplicationContext(), "升级状态冲突？", Toast.LENGTH_LONG).show();
+                    break;
+                case 4:
+                    Toast.makeText(getApplicationContext(), "文件大小异常？", Toast.LENGTH_LONG).show();
                     break;
                 case 5:
                     Toast.makeText(getApplicationContext(), "请确认蓝牙连接状态？", Toast.LENGTH_LONG).show();
@@ -684,6 +708,7 @@ public class DeviceControlActivity extends Activity {
         return true;
     }
 
+    Boolean menufiles =false;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
@@ -697,8 +722,10 @@ public class DeviceControlActivity extends Activity {
                 onBackPressed();
                 return true;
             case R.id.menu_files:
-
-                sendMessage(41);
+                if(!menufiles) {
+                    sendMessage(41);
+                    menufiles = true;
+                }
                 return true;
             default:
                 break;
@@ -1270,6 +1297,7 @@ public class DeviceControlActivity extends Activity {
                     Toast.makeText(DeviceControlActivity.this, "你没有选择任何文件！",
                             Toast.LENGTH_LONG).show();
                 }
+                menufiles =false;
             }
         }
     }

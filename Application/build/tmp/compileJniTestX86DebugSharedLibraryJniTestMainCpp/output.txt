@@ -1,8 +1,14 @@
 See file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/compileJniTestX86DebugSharedLibraryJniTestMainCpp/output.txt for all output for compileJniTestX86DebugSharedLibraryJniTestMainCpp.
+compiling aesEnDecode.cpp successful.
+
 compiling file_parse.cpp successful.
 H:\ProJ\BluetoothLeGatt1\Application\src\main\jni\file_parse.cpp:333:20: warning: conversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]
         char* classname = "com/example/android/bluetoothlegatt/MyNative";
                           ^
 1 warning generated.
+
+compiling AESENC.cpp successful.
+
+compiling AES.cpp successful.
 
 Finished compileJniTestX86DebugSharedLibraryJniTestMainCpp, see full log file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/compileJniTestX86DebugSharedLibraryJniTestMainCpp/output.txt.
