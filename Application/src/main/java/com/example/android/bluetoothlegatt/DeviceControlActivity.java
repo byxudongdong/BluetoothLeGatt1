@@ -509,7 +509,7 @@ public class DeviceControlActivity extends Activity {
                 {
                     update_sendUpdateReq();
                     try {
-                        Thread.currentThread().sleep(50);
+                        Thread.currentThread().sleep(5);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -616,7 +616,12 @@ public class DeviceControlActivity extends Activity {
                 case 9:
                     updateState.setText("升级成功！！！");
                     break;
+                case 10:
+                    upDateButton.setClickable(true);
+                    Toast.makeText(getApplicationContext(), "新升级文件准备就绪！", Toast.LENGTH_LONG).show();
+                    break;
                 case 11:
+                    upDateButton.setClickable(false);
                     new Thread(httpdownload,"Download").start();
                     break;
                 case 41:
@@ -1302,7 +1307,7 @@ public class DeviceControlActivity extends Activity {
 
     protected void loads() {
         String getdata = HttpUser.getJsonContent(Url);  //请求数据地址
-        if(getdata == null){
+        if(getdata == ""){
             sendMessage(7);
             return;
         }
@@ -1383,6 +1388,7 @@ public class DeviceControlActivity extends Activity {
                     if(output != null) {
                         output.close();
                         System.out.println("success");
+                        sendMessage(10);
                     }else {
                         System.out.println("fail");
                         sendMessage(11);

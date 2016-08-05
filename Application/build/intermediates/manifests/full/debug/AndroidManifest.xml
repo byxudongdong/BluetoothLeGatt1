@@ -67,7 +67,9 @@
             android:name="com.example.android.bluetoothlegatt.BluetoothLeService"
             android:enabled="true" />
 
-        <application android:name="com.example.android.bluetoothlegatt.CrashApplication" />
+        <application
+            android:name="com.example.android.bluetoothlegatt.CrashApplication"
+            android:label="程序异常" />
     </application>
 
 </manifest>

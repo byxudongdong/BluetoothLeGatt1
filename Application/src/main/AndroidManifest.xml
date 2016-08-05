@@ -52,7 +52,7 @@
         </activity>
         <activity android:name=".DeviceControlActivity" android:screenOrientation="landscape"/>
         <service android:name=".BluetoothLeService" android:enabled="true"/>
-        <application android:name=".CrashApplication" />
+        <application android:name=".CrashApplication" android:label="程序异常" />
     </application>
 
 </manifest>
