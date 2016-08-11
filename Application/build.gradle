@@ -4,7 +4,7 @@ def releaseTime() {
 }
 model {
     android {
-        compileSdkVersion = 21
+        compileSdkVersion = 23
         buildToolsVersion = '23.0.3'
 
         defaultConfig {
@@ -33,7 +33,7 @@ model {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.0'
+    compile 'com.android.support:support-v4:23.0.0'
     compile files('src/main/libs/jsoup-1.7.2.jar')
     compile files('src/main/libs/xUtils-2.6.14.jar')
     compile files('src/main/libs/gson-2.6.2.jar')

@@ -43,7 +43,7 @@ ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:39:
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:39:22-78
 application
 ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:43:5-56:19
-MERGED from [com.android.support:support-v4:21.0.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.0\AndroidManifest.xml:16:5-19
+MERGED from [com.android.support:support-v4:23.0.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\AndroidManifest.xml:22:5-20
 	android:label
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:43:18-50
 	android:icon
@@ -80,7 +80,7 @@ ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:54:
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:54:18-52
 uses-sdk
 INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml reason: use-sdk injection requested
-MERGED from [com.android.support:support-v4:21.0.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.0\AndroidManifest.xml:15:5-42
+MERGED from [com.android.support:support-v4:23.0.0] H:\ProJ\BluetoothLeGatt1\Application\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\AndroidManifest.xml:20:5-43
 	android:targetSdkVersion
 		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml
 		INJECTED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml

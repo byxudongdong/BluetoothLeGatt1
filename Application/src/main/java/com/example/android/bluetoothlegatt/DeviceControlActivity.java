@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -72,10 +73,14 @@ import java.util.UUID;
  * Bluetooth LE API.
  */
 public class DeviceControlActivity extends Activity {
+
+    private SharedPreferences sp;
+
     private MyProgress myProgress = null;
     //private Handler mHandler;
     Boolean getHw_version = false;
     byte[][] Hw_version = new byte[6][64];
+    byte[][] Hw_version1 = new byte[6][64];
     int HW_index = 0;
     int Hw_dataindex = 6;
     TextView textView ;
@@ -188,7 +193,8 @@ public class DeviceControlActivity extends Activity {
                     HW_index = HW_index + data.length;
                     if( data[data.length -1] == 0x2A)
                     {
-                        System.arraycopy(Hw_version[Hw_dataindex-1], 4, Hw_version[Hw_dataindex-1], 0,HW_index-7);
+
+                        System.arraycopy(Hw_version[Hw_dataindex-1], 4, Hw_version1[Hw_dataindex-1], 0,HW_index-7);
                         HW_index = 0;
                         Hw_dataindex --;
                         if(Hw_dataindex <=0)
@@ -196,12 +202,12 @@ public class DeviceControlActivity extends Activity {
                             Hw_dataindex =6;
                             //getHw_version = false;
                             Log.i("版本信息接受完毕","版本信息接受完毕");
-                            textView.setText(new String(Hw_version[0] ) +"\n"
-                                                +new String(Hw_version[1] ) +"\n"
-                                                +new String(Hw_version[2]) +"\n"
-                                                +new String(Hw_version[3]) +"\n"
-                                                +new String(Hw_version[4]) +"\n"
-                                                +new String(Hw_version[5]));
+                            textView.setText(new String(Hw_version1[0]) +"\n"
+                                                +new String(Hw_version1[1]) +"\n"
+                                                +new String(Hw_version1[2]) +"\n"
+                                                +new String(Hw_version1[3]) +"\n"
+                                                +new String(Hw_version1[4]) +"\n"
+                                                +new String(Hw_version1[5]));
 
                         }
                     }
@@ -299,8 +305,9 @@ public class DeviceControlActivity extends Activity {
         textView = (TextView)findViewById(R.id.textView);
 
         //textView.setMovementMethod(ScrollingMovementMethod.getInstance());
-
-
+        //获得实例对象
+        sp = this.getSharedPreferences("fileInfo", Context.MODE_WORLD_READABLE);
+        textView.setText( sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -323,7 +330,7 @@ public class DeviceControlActivity extends Activity {
                     Log.i("开始升级", "button onClick");
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     upDateButton.setClickable(false);
-
+                    version.setClickable(false);
                     //int ret = update_fileParse(fileName);
 
                     updateFlag = true;
@@ -399,6 +406,7 @@ public class DeviceControlActivity extends Activity {
             try{
                 String filePath = UpdateOpt.getSdCardPath() + "/Downloads/image_W16.hyc";
                 int retry =6;
+
                 while(imageNum <1) {
                     try {
                         imageNum = myNative.update_fileParse(filePath.getBytes());
@@ -459,8 +467,10 @@ public class DeviceControlActivity extends Activity {
                             Update_info.image_data);
                 }
                 update_step = 0;
+                PrintLog.printHexString("输出CRC信息------",Update_info.image_crc);
                 while (updateFlag && Update_info.hw_info[0] != 0x00 && mConnected) {
                     //发送唤醒
+                    //PrintLog.printHexString("输出CRC信息------",Update_info.image_crc);
                     if (update_step == 0) {
                         Log.i("唤醒蓝牙：", "wait...");
                         WriteComm(writecharacteristic, bytes, bytes.length);
@@ -509,7 +519,13 @@ public class DeviceControlActivity extends Activity {
 
             Log.i("使能按键：", "wait...");
             update_step = 0;
+            try {
+                fin.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             upDateButton.setClickable(true);
+            version.setClickable(true);
         }
     };
 
@@ -559,17 +575,17 @@ public class DeviceControlActivity extends Activity {
                 if ((consumingTime - startTime) >= 2000)
                 {
 			        /* 超时重发 */
-                    Log.i("发送升级请求：", "超时重发");
+                    Log.w("发送升级请求：", "超时重发");
                     update_step = UPDATE_STEP_SEND_REQUEST;
                 }
                 break;
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 400)
+                if ((consumingTime - startTime) >= 600)
                 {
 			        /* 超时重发 */
-                    Log.i("发送升级文件：", "超时重发");
+                    Log.w("发送升级文件：", "超时重发");
                     update_step = UPDATE_STEP_SEND_IMAGE;
                 }
                 break;
@@ -638,14 +654,22 @@ public class DeviceControlActivity extends Activity {
                         showSingleChoiceButton();
                     break;
                 case 9:
-                    updateState.setText("升级成功！！！");
+                    if(filedataLen == 0) {
+                        updateState.setText("升级异常，请重试！！！");
+                    }else {
+                        updateState.setText("升级成功！！！");
+                        imageNum = 0;           //BUG——+++++++++++++++++++++++++++++++++++++++++++++++++++++
+                    }
                     break;
                 case 10:
                     upDateButton.setClickable(true);
+                    version.setClickable(true);
                     Toast.makeText(getApplicationContext(), "新升级文件准备就绪！", Toast.LENGTH_LONG).show();
+                    textView.setText( sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
                     break;
                 case 11:
                     upDateButton.setClickable(false);
+                    version.setClickable(false);
                     new Thread(httpdownload,"Download").start();
                     break;
                 case 41:
@@ -700,6 +724,7 @@ public class DeviceControlActivity extends Activity {
             menu.findItem(R.id.menu_connect).setVisible(false);
             menu.findItem(R.id.menu_disconnect).setVisible(true);
             upDateButton.setClickable(true);
+            version.setClickable(true);
         } else {
             menu.findItem(R.id.menu_connect).setVisible(true);
             menu.findItem(R.id.menu_disconnect).setVisible(false);
@@ -981,7 +1006,7 @@ public class DeviceControlActivity extends Activity {
             for(int i = 0;i<DateCount;i=i+20)
             {
                 bool = WriteCharacteristic.setValue(UpdateOpt.subBytes(SendData, i, 20));
-                PrintLog.printHexString("Gatt写长数据",WriteCharacteristic.getValue());
+                //PrintLog.printHexString("Gatt写长数据",WriteCharacteristic.getValue());
                 WriteCharacterRspFlag = false;
                 BluetoothLeService.writeCharacteristic(WriteCharacteristic);//BluetoothLeService.writeCharacteristic(WriteCharacteristic);
 
@@ -1000,7 +1025,7 @@ public class DeviceControlActivity extends Activity {
                         e.printStackTrace();
                     }
                 }
-                Log.i("回应标志：", WriteCharacterRspFlag.toString());
+                //Log.i("回应标志：", WriteCharacterRspFlag.toString());
                 WriteCharacterRspFlag = false;
             }
             bool = true;
@@ -1191,8 +1216,9 @@ public class DeviceControlActivity extends Activity {
                 {
 			        /* CRC校验正确 */
                     //mySetRecvInfo("CRC校验正确");
-                    Log.i("CRC校验正确","CRC校验正确");
+                    Log.i("CRC校验正确0","CRC校验正确0");
                     update_step = UPDATE_STEP_CRC_RES_RECV;
+                    PrintLog.printHexString("输出CRC信息------",Update_info.image_crc);
                     sendMessage(9);
                 }
                 else
@@ -1416,6 +1442,11 @@ public class DeviceControlActivity extends Activity {
                     if(output != null) {
                         output.close();
                         System.out.println("success");
+
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString("FileName", province[index]);
+                        editor.commit();
+
                         sendMessage(10);
                     }else {
                         System.out.println("fail");
