@@ -97,6 +97,13 @@
                     android:onClick="version"
                     android:layout_height="match_parent"
                     android:text="获取版本"/>
+                <!--<Button-->
+                    <!--android:id="@+id/test"-->
+                    <!--android:layout_marginLeft="20dp"-->
+                    <!--android:layout_width="150dp"-->
+                    <!--android:onClick="test"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:text="测试"/>-->
             </LinearLayout>
 
         </LinearLayout>

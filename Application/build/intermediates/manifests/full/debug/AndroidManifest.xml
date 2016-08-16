@@ -21,7 +21,7 @@
 
     <uses-sdk
         android:minSdkVersion="18"
-        android:targetSdkVersion="20" />
+        android:targetSdkVersion="21" />
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
 
@@ -35,6 +35,9 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
+
+    <!-- Android6.0 蓝牙扫描才需要 -->
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />

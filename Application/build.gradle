@@ -10,7 +10,7 @@ model {
         defaultConfig {
             applicationId    = 'com.example.android.bluetoothlegatt'
             minSdkVersion.apiLevel    = 18
-            targetSdkVersion.apiLevel = 20
+            targetSdkVersion.apiLevel = 21
         }
 
         ndk {

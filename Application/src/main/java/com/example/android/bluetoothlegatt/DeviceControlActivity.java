@@ -272,7 +272,7 @@ public class DeviceControlActivity extends Activity {
                     return false;
                 }
     };
-    private int update_sendSize;
+    public static int update_sendSize;
 
     private void clearUI() {
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
@@ -365,6 +365,12 @@ public class DeviceControlActivity extends Activity {
         }
     }
 
+    public void test(View v){
+        Log.i("跳过数据包","数据包+112");
+        update_sendSize += 112*2;
+        //update_sendSize = 79968 - 112*10;
+    }
+
     Runnable mRunnable = new Runnable() {
         public void run() {
             //自定义功能
@@ -406,7 +412,7 @@ public class DeviceControlActivity extends Activity {
             try{
                 String filePath = UpdateOpt.getSdCardPath() + "/Downloads/image_W16.hyc";
                 int retry =6;
-
+                imageNum = 0;
                 while(imageNum <1) {
                     try {
                         imageNum = myNative.update_fileParse(filePath.getBytes());
@@ -553,7 +559,7 @@ public class DeviceControlActivity extends Activity {
                 startTime = System.currentTimeMillis();  //開始時間
                 break;
             case UpdateStepSendImage:
-                Log.i("发送升级文件：", "发送升级文件"+String.valueOf(update_sendSize)
+                Log.w("发送升级文件：", "发送升级文件"+String.valueOf(update_sendSize)
                                                     + ":"+String.valueOf(filedataLen) );
                 //sendMessage( 3 );
                 /* 发送升级数据 */
@@ -582,11 +588,15 @@ public class DeviceControlActivity extends Activity {
             case UpdateStepWaitImageRes:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 600)
+                if ((consumingTime - startTime) >= 800)
                 {
 			        /* 超时重发 */
                     Log.w("发送升级文件：", "超时重发");
                     update_step = UPDATE_STEP_SEND_IMAGE;
+                    if(update_sendSize == 79968 || update_sendSize == 79968-112 ) {
+                        //PrintLog.printHexString("当前数据为：", temp);
+                        //update_sendSize += update_sendLen;
+                    }
                 }
                 break;
             case UpdateStepWaitCRCRes:
@@ -620,7 +630,8 @@ public class DeviceControlActivity extends Activity {
                 case 0:
                     update_step = 0;
                     //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    Toast.makeText(getApplicationContext(), "升级成功！！！", Toast.LENGTH_SHORT).show();
+                    if(filedataLen != 0)
+                        Toast.makeText(getApplicationContext(), "升级成功！！！", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
                     //Toast.makeText(getApplicationContext(), "收到回应", Toast.LENGTH_SHORT).show();
@@ -657,7 +668,7 @@ public class DeviceControlActivity extends Activity {
                     if(filedataLen == 0) {
                         updateState.setText("升级异常，请重试！！！");
                     }else {
-                        updateState.setText("升级成功！！！");
+                        updateState.setText("升级成功！");
                         imageNum = 0;           //BUG——+++++++++++++++++++++++++++++++++++++++++++++++++++++
                     }
                     break;
@@ -739,6 +750,9 @@ public class DeviceControlActivity extends Activity {
         switch(item.getItemId()) {
             case R.id.menu_connect:
                 mBluetoothLeService.connect(mDeviceAddress);
+                update_sendSize = 0;
+                filedataLen = 0;
+                update_step = 0;
                 return true;
             case R.id.menu_disconnect:
                 mBluetoothLeService.disconnect();
@@ -953,7 +967,7 @@ public class DeviceControlActivity extends Activity {
 /* 封包最小长度 */
 //    int	    COMM_PAKET_LEN_MIN	=	(6);
 //    int 	COMM_DATA_BUF_LEN	    =	(1024);
-    int     UPDATE_SEND_PAKET_SIZE  = 92;
+    int     UPDATE_SEND_PAKET_SIZE  = 112;
 
     //final int UPDATE_REQUEST_ID		=	(int)(0xFFFD);
     //final int UPDATE_CRC_RESP_ID		=	(int)(0xFFFC);
@@ -993,11 +1007,15 @@ public class DeviceControlActivity extends Activity {
         }
         temp[len+4] = (byte)sum;
         //Log.i("调用特征值写：", "wait...");
+//        if(update_sendSize == 79968 ) {
+//            PrintLog.printHexString("当前数据为：", temp);
+//            //update_sendSize += update_sendLen;
+//        }
         WriteComm(writecharacteristic,temp, len+6);
-
         return true;
     }
 
+    //byte[]
     public static Boolean WriteComm(BluetoothGattCharacteristic WriteCharacteristic, byte[] SendData, int DateCount)
     {
         Boolean bool = false;
@@ -1009,7 +1027,14 @@ public class DeviceControlActivity extends Activity {
                 //PrintLog.printHexString("Gatt写长数据",WriteCharacteristic.getValue());
                 WriteCharacterRspFlag = false;
                 BluetoothLeService.writeCharacteristic(WriteCharacteristic);//BluetoothLeService.writeCharacteristic(WriteCharacteristic);
-
+//                if (update_sendSize == 79968) {
+//                    PrintLog.printHexString("当前数据为：", SendData);
+//                }
+                try {
+                    Thread.currentThread().sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 while (!WriteCharacterRspFlag)
                 {
 //                    count++;
@@ -1020,7 +1045,7 @@ public class DeviceControlActivity extends Activity {
 //                    }
                     //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
-                        Thread.currentThread().sleep(10);
+                        Thread.currentThread().sleep(20);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1061,19 +1086,28 @@ public class DeviceControlActivity extends Activity {
         return bool;
     }
 
-    int update_sendImageData()
-    {
-        byte UPDATE_SEND_PAKET_SIZE	=	(92);//(100)//(112)//(32)//(12)//(14)//(64)//
-        byte[] temp = new byte[UPDATE_SEND_PAKET_SIZE+2];
+    int update_sendImageData() {
+        byte UPDATE_SEND_PAKET_SIZE = (112);//(100)//(112)//(32)//(12)//(14)//(64)//
+        byte[] temp = new byte[UPDATE_SEND_PAKET_SIZE + 2];
         int imageReadLen = 0;
         int index;
 
-        index = (update_sendSize/UPDATE_SEND_PAKET_SIZE)+1;
+        index = (update_sendSize / UPDATE_SEND_PAKET_SIZE) + 1;
         //memcpy(&temp[0], &index, sizeof(U16));
         temp[0] = (byte) (index >> 8 * 0 & 0xFF);
         temp[1] = (byte) (index >> 8 * 1 & 0xFF);
 
         imageReadLen = update_readImageData(temp, update_sendSize, UPDATE_SEND_PAKET_SIZE);
+
+        if(update_sendSize == 79968 || update_sendSize == 79968-112 ) {
+            //PrintLog.printHexString("当前数据为：", temp);
+            try {
+                Thread.currentThread().sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (imageReadLen <= 0)
         {
 		/* 升级数据发送完成 */
@@ -1094,7 +1128,7 @@ public class DeviceControlActivity extends Activity {
     int update_readImageData(byte pData[], int offset, int len)
     {
         int readLen;
-        byte[] senddata=new byte[98];
+        byte[] senddata=new byte[UPDATE_SEND_PAKET_SIZE +6];
 
         if (offset >= filedataLen)
         {
@@ -1236,7 +1270,10 @@ public class DeviceControlActivity extends Activity {
                 {
 			        /* 数据包被正确接收 */
                     update_sendSize += update_sendLen;
+                    //update_sendSize = 79968;
                     int persent = (int)Math.floor(100*((double)update_sendSize/filedataLen));
+//                    if(update_sendSize == 79968+92)
+//                        PrintLog.printHexString("发送数据：",);
                     myProgress.setProgress(persent);
                     if (update_sendSize >= filedataLen)
                     {
@@ -1390,74 +1427,74 @@ public class DeviceControlActivity extends Activity {
      * @Author: LinYiSong
      * @Date: 2011-3-25~2011-3-25
      */
-        public void downloadfile(String  urlStr)
-        {
-            String path="Downloads";
-            String fileName="image_W16.hyc";
-            OutputStream output=null;
+    public void downloadfile(String  urlStr)
+    {
+        String path="Downloads";
+        String fileName="image_W16.hyc";
+        OutputStream output=null;
+        try {
+            /*
+             * 通过URL取得HttpURLConnection
+             * 要网络连接成功，需在AndroidMainfest.xml中进行权限配置
+             * <uses-permission android:name="android.permission.INTERNET" />
+             */
+            //urlStr = null;
+            URL url=new URL( urlStr);
+            HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+            //获得文件的长度
+            int contentLength = conn.getContentLength();
+            System.out.println("长度 :"+contentLength);
+
+            //取得inputStream，并将流中的信息写入SDCard
+            //String SDCard= Environment.getExternalStorageDirectory()+"";
+            String SDCard= Environment.getExternalStorageDirectory()+"";
+            String pathName=SDCard+"/"+path+"/"+fileName;//文件存储路径
+
+            File file=new File(pathName);
+            InputStream input=conn.getInputStream();
+            if(file.exists()){
+                System.out.println("exits");
+                file.delete();
+            }else{
+                String dir=SDCard+"/"+path;
+                new File(dir).mkdir();//新建文件夹
+                file.createNewFile();//新建文件
+                output=new FileOutputStream(file);
+                //读取大文件
+                byte[] buffer=new byte[1024];
+                //Log.w("文件请求大小",String.valueOf(input.available()));
+                int len;            //重要参数
+                while( (len = input.read(buffer))!=-1 ){
+                    output.write(buffer,0,len);
+                }
+                output.flush();
+                input.close();
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
             try {
-                /*
-                 * 通过URL取得HttpURLConnection
-                 * 要网络连接成功，需在AndroidMainfest.xml中进行权限配置
-                 * <uses-permission android:name="android.permission.INTERNET" />
-                 */
-                //urlStr = null;
-                URL url=new URL( urlStr);
-                HttpURLConnection conn=(HttpURLConnection)url.openConnection();
-                //获得文件的长度
-                int contentLength = conn.getContentLength();
-                System.out.println("长度 :"+contentLength);
+                if(output != null) {
+                    output.close();
+                    System.out.println("success");
+                    menufiles = false;
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("FileName", province[index]);
+                    editor.commit();
 
-                //取得inputStream，并将流中的信息写入SDCard
-                //String SDCard= Environment.getExternalStorageDirectory()+"";
-                String SDCard= Environment.getExternalStorageDirectory()+"";
-                String pathName=SDCard+"/"+path+"/"+fileName;//文件存储路径
-
-                File file=new File(pathName);
-                InputStream input=conn.getInputStream();
-                if(file.exists()){
-                    System.out.println("exits");
-                    file.delete();
-                }else{
-                    String dir=SDCard+"/"+path;
-                    new File(dir).mkdir();//新建文件夹
-                    file.createNewFile();//新建文件
-                    output=new FileOutputStream(file);
-                    //读取大文件
-                    byte[] buffer=new byte[1024];
-                    //Log.w("文件请求大小",String.valueOf(input.available()));
-                    int len;            //重要参数
-                    while( (len = input.read(buffer))!=-1 ){
-                        output.write(buffer,0,len);
-                    }
-                    output.flush();
-                    input.close();
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally{
-                try {
-                    if(output != null) {
-                        output.close();
-                        System.out.println("success");
-
-                        SharedPreferences.Editor editor = sp.edit();
-                        editor.putString("FileName", province[index]);
-                        editor.commit();
-
-                        sendMessage(10);
-                    }else {
-                        System.out.println("fail");
-                        sendMessage(11);
-                    }
-                } catch (IOException e) {
+                    sendMessage(10);
+                }else {
                     System.out.println("fail");
-                    e.printStackTrace();
+                    sendMessage(11);
                 }
+            } catch (IOException e) {
+                System.out.println("fail");
+                e.printStackTrace();
             }
         }
+    }
 
 
 }

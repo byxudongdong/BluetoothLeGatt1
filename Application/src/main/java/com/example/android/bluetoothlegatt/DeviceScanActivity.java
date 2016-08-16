@@ -89,22 +89,22 @@ public class DeviceScanActivity extends ListActivity {
 
         //List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         //Set<BluetoothDevice> devices = mBluetoothAdapter.getBondedDevices();
-        List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
-        if (devices.size()>0) {
-            for(Iterator<BluetoothDevice> iterator = devices.iterator(); iterator.hasNext();){
-                BluetoothDevice bluetoothDevice=(BluetoothDevice)iterator.next();
-                System.out.println("设备："+bluetoothDevice.getName() + " " + bluetoothDevice.getAddress());
-
-                final Intent intent = new Intent(this, DeviceControlActivity.class);
-                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, bluetoothDevice.getName());
-                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, bluetoothDevice.getAddress());
-                if (mScanning) {
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    mScanning = false;
-                }
-                startActivity(intent);
-            }
-        }
+//        List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
+//        if (devices.size()>0) {
+//            for(Iterator<BluetoothDevice> iterator = devices.iterator(); iterator.hasNext();){
+//                BluetoothDevice bluetoothDevice=(BluetoothDevice)iterator.next();
+//                System.out.println("设备："+bluetoothDevice.getName() + " " + bluetoothDevice.getAddress());
+//
+//                final Intent intent = new Intent(this, DeviceControlActivity.class);
+//                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, bluetoothDevice.getName());
+//                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, bluetoothDevice.getAddress());
+//                if (mScanning) {
+//                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//                    mScanning = false;
+//                }
+//                startActivity(intent);
+//            }
+//        }
     }
 
     @Override
