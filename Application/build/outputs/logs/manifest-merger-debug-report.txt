@@ -71,9 +71,7 @@ ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:53:
 	android:name
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:53:27-74
 activity#com.example.android.bluetoothlegatt.DeviceControlActivity
-ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:56:9-96
-	android:screenOrientation
-		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:56:57-94
+ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:56:9-59
 	android:name
 		ADDED from H:\ProJ\BluetoothLeGatt1\Application\src\main\AndroidManifest.xml:56:19-56
 service#com.example.android.bluetoothlegatt.BluetoothLeService

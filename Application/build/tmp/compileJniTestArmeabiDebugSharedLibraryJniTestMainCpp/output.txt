@@ -1,8 +1,4 @@
 See file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/compileJniTestArmeabiDebugSharedLibraryJniTestMainCpp/output.txt for all output for compileJniTestArmeabiDebugSharedLibraryJniTestMainCpp.
-compiling AES.cpp successful.
-
-compiling AESENC.cpp successful.
-
 compiling aesEnDecode.cpp successful.
 
 compiling file_parse.cpp successful.
@@ -10,5 +6,9 @@ H:\ProJ\BluetoothLeGatt1\Application\src\main\jni\file_parse.cpp:333:20: warning
         char* classname = "com/example/android/bluetoothlegatt/MyNative";
                           ^
 1 warning generated.
+
+compiling AESENC.cpp successful.
+
+compiling AES.cpp successful.
 
 Finished compileJniTestArmeabiDebugSharedLibraryJniTestMainCpp, see full log file:///H:/ProJ/BluetoothLeGatt1/Application/build/tmp/compileJniTestArmeabiDebugSharedLibraryJniTestMainCpp/output.txt.

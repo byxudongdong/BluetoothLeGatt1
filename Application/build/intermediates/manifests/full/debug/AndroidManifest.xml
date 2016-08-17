@@ -62,9 +62,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.example.android.bluetoothlegatt.DeviceControlActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name="com.example.android.bluetoothlegatt.DeviceControlActivity" />
 
         <service
             android:name="com.example.android.bluetoothlegatt.BluetoothLeService"

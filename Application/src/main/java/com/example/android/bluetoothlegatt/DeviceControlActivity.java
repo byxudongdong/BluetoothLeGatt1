@@ -207,7 +207,8 @@ public class DeviceControlActivity extends Activity {
                                                 +new String(Hw_version1[2]) +"\n"
                                                 +new String(Hw_version1[3]) +"\n"
                                                 +new String(Hw_version1[4]) +"\n"
-                                                +new String(Hw_version1[5]));
+                                                +new String(Hw_version1[5]) + "\n" );
+                            sendMessage(42);
 
                         }
                     }
@@ -276,7 +277,7 @@ public class DeviceControlActivity extends Activity {
 
     private void clearUI() {
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
-        mDataField.setText(R.string.no_data);
+        //mDataField.setText(R.string.no_data);
     }
 
     @Override
@@ -296,7 +297,7 @@ public class DeviceControlActivity extends Activity {
         mGattServicesList.setVisibility(View.GONE);
 
         mConnectionState = (TextView) findViewById(R.id.connection_state);
-        mDataField = (TextView) findViewById(R.id.data_value);
+        //mDataField = (TextView) findViewById(R.id.data_value);
 
         version = (Button) findViewById(R.id.version);
         upDateButton = (Button)findViewById(R.id.updateButton);
@@ -307,7 +308,7 @@ public class DeviceControlActivity extends Activity {
         //textView.setMovementMethod(ScrollingMovementMethod.getInstance());
         //获得实例对象
         sp = this.getSharedPreferences("fileInfo", Context.MODE_WORLD_READABLE);
-        textView.setText( sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
+        updateState.setText( "升级文件信息："+ sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -382,13 +383,16 @@ public class DeviceControlActivity extends Activity {
         }
     };
 
-    public final int UpdateStepSendRequst = 0,
-                    UpdateStepWaitRequestRes = 1,
-                    UpdateStepSendImage = 2,
-                    UpdateStepWaitImageRes = 3,
-                    UpdateStepWaitCRCRes = 4,
-                    UpdateStepCRCResRecv = 5;
-    public int update_sendLen=0,filedataLen=0,updateIdex= 0,update_step = UpdateStepSendRequst;
+    final int UPDATE_STEP_SEND_REQUEST	=	0;
+    final int UPDATE_STEP_WAIT_REQUEST_RES=	1;
+
+    final int UPDATE_STEP_SEND_IMAGE		=	2;
+    final int UPDATE_STEP_WAIT_IMAGE_RES	=	3;
+
+    final int UPDATE_STEP_WAIT_CRC_RES	=	4;
+    final int UPDATE_STEP_CRC_RES_RECV 	=	5;
+
+    public int update_sendLen=0,filedataLen=0,updateIdex= 0,update_step = UPDATE_STEP_SEND_REQUEST;
     public long startTime=0,consumingTime=0;  //開始時間
     FileInputStream fin = null;
     byte [] buffer = null;
@@ -512,10 +516,8 @@ public class DeviceControlActivity extends Activity {
 //                }
                     if (update_step == 5) {
                         //升级完成后
+                        sendMessage(0);
                         updateFlag = false;
-                        Message message = new Message();
-                        message.what = 0;
-                        handler.sendMessage(message);
                         break;
                     }
 
@@ -540,7 +542,7 @@ public class DeviceControlActivity extends Activity {
         //startTime = System.currentTimeMillis();  //開始時間
         switch (update_step)
         {
-            case UpdateStepSendRequst:
+            case UPDATE_STEP_SEND_REQUEST:
                 //发送升级请求
                 Log.i("发送升级请求：", "发送升级请求");
                 sendMessage( 2 );
@@ -558,17 +560,17 @@ public class DeviceControlActivity extends Activity {
                 update_step++;
                 startTime = System.currentTimeMillis();  //開始時間
                 break;
-            case UpdateStepSendImage:
+            case UPDATE_STEP_SEND_IMAGE:
                 Log.w("发送升级文件：", "发送升级文件"+String.valueOf(update_sendSize)
                                                     + ":"+String.valueOf(filedataLen) );
                 //sendMessage( 3 );
                 /* 发送升级数据 */
-                if( update_sendSize >= filedataLen) {
+                if( update_sendSize >= filedataLen && update_sendSize>60000) {
                     update_step = UPDATE_STEP_WAIT_CRC_RES;
                     break;
                 }
                 update_sendLen = update_sendImageData();
-                if( update_sendLen < 1 ) {
+                if( update_sendLen < UPDATE_SEND_PAKET_SIZE && update_sendSize>60000) {
                     startTime = System.currentTimeMillis();  //開始時間
                     update_step = UPDATE_STEP_WAIT_CRC_RES;
                     break;
@@ -576,7 +578,7 @@ public class DeviceControlActivity extends Activity {
                 startTime = System.currentTimeMillis();  //開始時間
                 update_step++;
                 break;
-            case UpdateStepWaitRequestRes:
+            case UPDATE_STEP_WAIT_REQUEST_RES:
                 consumingTime = System.currentTimeMillis();
                 if ((consumingTime - startTime) >= 2000)
                 {
@@ -585,21 +587,22 @@ public class DeviceControlActivity extends Activity {
                     update_step = UPDATE_STEP_SEND_REQUEST;
                 }
                 break;
-            case UpdateStepWaitImageRes:
+            case UPDATE_STEP_WAIT_IMAGE_RES:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
-                if ((consumingTime - startTime) >= 800)
+                if ((consumingTime - startTime) >= 900)
                 {
 			        /* 超时重发 */
                     Log.w("发送升级文件：", "超时重发");
                     update_step = UPDATE_STEP_SEND_IMAGE;
-                    if(update_sendSize == 79968 || update_sendSize == 79968-112 ) {
+                    if(update_sendSize == 79968 || update_sendSize == 79968-112
+                            || update_sendSize == 45136-112 || update_sendSize == 45136) {
                         //PrintLog.printHexString("当前数据为：", temp);
                         //update_sendSize += update_sendLen;
                     }
                 }
                 break;
-            case UpdateStepWaitCRCRes:
+            case UPDATE_STEP_WAIT_CRC_RES:
                 /* 等待升级请求和升级数据回应 */
                 consumingTime = System.currentTimeMillis();
                 if ((consumingTime - startTime) >= 5000)
@@ -611,7 +614,7 @@ public class DeviceControlActivity extends Activity {
                     update_step = UPDATE_STEP_CRC_RES_RECV;
                 }
                 break;
-            case UpdateStepCRCResRecv:
+            case UPDATE_STEP_CRC_RES_RECV:
                 Log.i("CRC校验正确", "升级完成");
                 Log.i("升级完成", "升级完成");
                 //升级成功
@@ -636,7 +639,7 @@ public class DeviceControlActivity extends Activity {
                 case 1:
                     //Toast.makeText(getApplicationContext(), "收到回应", Toast.LENGTH_SHORT).show();
                     //receiveDataFlag = true;
-                    updateState.setText("收到回应");
+                    //updateState.setText("收到回应");
 //                    synchronized(object)
 //                    {
 //                        Log.i("解锁通知：", "wait...");
@@ -644,7 +647,7 @@ public class DeviceControlActivity extends Activity {
 //                    }
                     break;
                 case 2:
-                    updateState.setText("发送升级请求");
+                    //updateState.setText("发送升级请求");
                     break;
                 case 3:
                     Toast.makeText(getApplicationContext(), "升级状态冲突？", Toast.LENGTH_LONG).show();
@@ -666,9 +669,9 @@ public class DeviceControlActivity extends Activity {
                     break;
                 case 9:
                     if(filedataLen == 0) {
-                        updateState.setText("升级异常，请重试！！！");
+                        //updateState.setText("升级异常，请重试！！！");
                     }else {
-                        updateState.setText("升级成功！");
+                        //updateState.setText("升级成功！");
                         imageNum = 0;           //BUG——+++++++++++++++++++++++++++++++++++++++++++++++++++++
                     }
                     break;
@@ -676,7 +679,7 @@ public class DeviceControlActivity extends Activity {
                     upDateButton.setClickable(true);
                     version.setClickable(true);
                     Toast.makeText(getApplicationContext(), "新升级文件准备就绪！", Toast.LENGTH_LONG).show();
-                    textView.setText( sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
+                    updateState.setText( "升级文件信息："+sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
                     break;
                 case 11:
                     upDateButton.setClickable(false);
@@ -685,6 +688,9 @@ public class DeviceControlActivity extends Activity {
                     break;
                 case 41:
                     new Thread(runnable,"GetFiles").start();
+                    break;
+                case 42:
+                    updateState.setText( "升级文件信息："+sp.getString("FileName", "不存在升级文件，请先选择升级文件！") );
                     break;
             }
         }
@@ -800,7 +806,7 @@ public class DeviceControlActivity extends Activity {
 
     private void displayData(String data) {
         if (data != null) {
-            mDataField.setText(data);
+            //mDataField.setText(data);
         }
     }
 
@@ -1031,7 +1037,7 @@ public class DeviceControlActivity extends Activity {
 //                    PrintLog.printHexString("当前数据为：", SendData);
 //                }
                 try {
-                    Thread.currentThread().sleep(10);
+                    Thread.currentThread().sleep(20);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -1045,7 +1051,7 @@ public class DeviceControlActivity extends Activity {
 //                    }
                     //BluetoothLeService.writeCharacteristic(WriteCharacteristic);
                     try {
-                        Thread.currentThread().sleep(20);
+                        Thread.currentThread().sleep(10);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1099,10 +1105,13 @@ public class DeviceControlActivity extends Activity {
 
         imageReadLen = update_readImageData(temp, update_sendSize, UPDATE_SEND_PAKET_SIZE);
 
-        if(update_sendSize == 79968 || update_sendSize == 79968-112 ) {
+        if(update_sendSize == 79968 || update_sendSize == 79968-112
+                || update_sendSize == 45136-112 || update_sendSize == 45136
+                || update_sendSize == 49168)
+        {
             //PrintLog.printHexString("当前数据为：", temp);
             try {
-                Thread.currentThread().sleep(1000);
+                Thread.currentThread().sleep(800);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -1154,14 +1163,6 @@ public class DeviceControlActivity extends Activity {
         return readLen;
     }
 
-    final int UPDATE_STEP_SEND_REQUEST	=	0;
-    final int UPDATE_STEP_WAIT_REQUEST_RES=	1;
-
-    final int UPDATE_STEP_SEND_IMAGE		=	2;
-    final int UPDATE_STEP_WAIT_IMAGE_RES	=	3;
-
-    final int UPDATE_STEP_WAIT_CRC_RES	=	4;
-    final int UPDATE_STEP_CRC_RES_RECV 	=	5;
 
     public int imageIndex = 0,imageNum=0;
     Boolean supportCipher = false;
@@ -1212,7 +1213,7 @@ public class DeviceControlActivity extends Activity {
                             e.printStackTrace();
                         }
 
-                        update_step++;
+                        update_step = UPDATE_STEP_SEND_IMAGE;
                         if (len > 3)
                         {
                             Log.i("芯片支持OAD0....","芯片支持OAD");
@@ -1275,7 +1276,7 @@ public class DeviceControlActivity extends Activity {
 //                    if(update_sendSize == 79968+92)
 //                        PrintLog.printHexString("发送数据：",);
                     myProgress.setProgress(persent);
-                    if (update_sendSize >= filedataLen)
+                    if (update_sendSize >= filedataLen && filedataLen>60000)
                     {
 				        /* 数据包发送完成，等待CRC校验结果 */
                         Log.i("数据包发送完成，等待CRC校验结果","等待CRC校验");
