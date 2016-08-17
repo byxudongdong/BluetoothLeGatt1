@@ -208,6 +208,7 @@ public class DeviceControlActivity extends Activity {
                                                 +new String(Hw_version1[3]) +"\n"
                                                 +new String(Hw_version1[4]) +"\n"
                                                 +new String(Hw_version1[5]) + "\n" );
+                            Hw_version1 = new byte[6][64];
                             sendMessage(42);
 
                         }
@@ -727,6 +728,7 @@ public class DeviceControlActivity extends Activity {
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             //do something...
+            updateFlag =false;
             finish();
             //moveTaskToBack(false);
             return true;
@@ -761,10 +763,13 @@ public class DeviceControlActivity extends Activity {
                 update_step = 0;
                 return true;
             case R.id.menu_disconnect:
-                mBluetoothLeService.disconnect();
+                if(!updateFlag)
+                    mBluetoothLeService.disconnect();
                 return true;
             case android.R.id.home:
                 onBackPressed();
+                updateFlag =false;
+                finish();
                 return true;
             case R.id.menu_files:
                 if(!menufiles) {
@@ -1105,13 +1110,21 @@ public class DeviceControlActivity extends Activity {
 
         imageReadLen = update_readImageData(temp, update_sendSize, UPDATE_SEND_PAKET_SIZE);
 
-        if(update_sendSize == 79968 || update_sendSize == 79968-112
-                || update_sendSize == 45136-112 || update_sendSize == 45136
-                || update_sendSize == 49168)
+//        if(update_sendSize == 79968 || update_sendSize == 79968-112
+//                || update_sendSize == 45136-112 || update_sendSize == 45136
+//                || update_sendSize == 49168)
+        Boolean wait = (update_sendSize+112)/1024-(update_sendSize/1024)>0;
+        if(wait)
         {
             //PrintLog.printHexString("当前数据为：", temp);
             try {
-                Thread.currentThread().sleep(800);
+                Thread.currentThread().sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                Thread.currentThread().sleep(30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

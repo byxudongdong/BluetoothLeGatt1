@@ -148,6 +148,9 @@ public class DeviceScanActivity extends ListActivity {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
+        }else {
+//            mBluetoothAdapter.disable();
+//            mBluetoothAdapter.enable();
         }
 
         // Initializes list view adapter.
