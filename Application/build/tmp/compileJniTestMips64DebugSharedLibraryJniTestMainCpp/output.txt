@@ -11,11 +11,11 @@ H:\ProJ\BluetoothLeGatt1\Application\src\main\jni\file_parse.cpp:333:20: warning
                           ^
 1 warning generated.
 
-compiling AESENC.cpp successful.
+compiling AES.cpp successful.
 clang++.exe: warning: optimization flag '-finline-functions' is not supported
 clang++.exe: warning: argument unused during compilation: '-finline-functions'
 
-compiling AES.cpp successful.
+compiling AESENC.cpp successful.
 clang++.exe: warning: optimization flag '-finline-functions' is not supported
 clang++.exe: warning: argument unused during compilation: '-finline-functions'
 

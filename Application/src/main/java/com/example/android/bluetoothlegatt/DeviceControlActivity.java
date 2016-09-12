@@ -95,7 +95,7 @@ public class DeviceControlActivity extends Activity {
 
     UpdateOpt updateOpt = new UpdateOpt();
     //public static Object object = new Object();
-    Thread mthread;
+    Thread mthread,mythread;
     Boolean updateFlag = false;
     String newtime;
     public Button upDateButton,version;
@@ -171,8 +171,10 @@ public class DeviceControlActivity extends Activity {
                 Log.i("发现服务","打印服务列表");
                 //displayGattServices(mBluetoothLeService.getSupportedGattServices());
                //写数据的服务和characteristic
+                mBluetoothLeService.UpdateSpeed();
                 mnotyGattService = mBluetoothLeService.getSupportedGattService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
                 writecharacteristic = mnotyGattService.getCharacteristic(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
+
             }
             //显示数据
             else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
@@ -333,6 +335,7 @@ public class DeviceControlActivity extends Activity {
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     upDateButton.setClickable(false);
                     version.setClickable(false);
+
                     //int ret = update_fileParse(fileName);
 
                     updateFlag = true;
@@ -361,7 +364,9 @@ public class DeviceControlActivity extends Activity {
     {
         if(mConnected) {
             getHw_version = true;
-            mRunnable.run();
+            mythread = new Thread(mRunnable, "GetVersion");
+            mythread.start();
+
         }else{
             sendMessage(5);
         }
@@ -424,18 +429,22 @@ public class DeviceControlActivity extends Activity {
                     } catch (Exception e) {
                         Log.w("升级文件不存在：", "请放入升级文件");
                         sendMessage(6);
+                        //Toast.makeText(getApplicationContext(), "未找到升级文件！", Toast.LENGTH_SHORT).show();
                     }
                     if(imageNum >0) break;
                     retry --;
                     if(retry == 0){
                         Log.i("升级文件个数", String.valueOf(imageNum));
+                        //Toast.makeText(getApplicationContext(), "未找到升级文件！", Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
-
-                fin = new FileInputStream(filePath);
-                int filedataLenTotal = fin.available();
-                Log.i("文件字节数",String.valueOf(filedataLenTotal)+":"+String.valueOf(imageNum));
+                File file=new File(filePath);
+                if(file.exists()) {
+                    fin = new FileInputStream(filePath);
+                    int filedataLenTotal = fin.available();
+                    Log.i("文件字节数", String.valueOf(filedataLenTotal) + ":" + String.valueOf(imageNum));
+                }
                 if(imageNum >0) {
                     try {
                         fin.close();
@@ -461,6 +470,7 @@ public class DeviceControlActivity extends Activity {
 //                }
             if(imageNum <1) {
                 sendMessage(6);
+                //Toast.makeText(getApplicationContext(), "未找到升级文件！", Toast.LENGTH_SHORT).show();
                 updateFlag = false;
             }else {
                 int ret = myNative.update_getImageInfo(imageIndex, Update_info.ppVer_Str,
@@ -529,7 +539,9 @@ public class DeviceControlActivity extends Activity {
             Log.i("使能按键：", "wait...");
             update_step = 0;
             try {
-                fin.close();
+                if(fin != null) {
+                    fin.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -747,6 +759,8 @@ public class DeviceControlActivity extends Activity {
         } else {
             menu.findItem(R.id.menu_connect).setVisible(true);
             menu.findItem(R.id.menu_disconnect).setVisible(false);
+//            updateFlag =false;
+//            finish();
         }
 
         return true;
@@ -772,7 +786,7 @@ public class DeviceControlActivity extends Activity {
                 finish();
                 return true;
             case R.id.menu_files:
-                if(!menufiles) {
+                if(!menufiles && updateFlag == false) {
                     sendMessage(41);
                     menufiles = true;
                 }
@@ -989,7 +1003,7 @@ public class DeviceControlActivity extends Activity {
     final byte UPDATE_REJECT_REASON_HW_ERR		=	(0x01);//硬件版本错误
     final byte UPDATE_REJECT_REASON_SIZE_ERR	=	(0x02);//升级包大小错误(超过限制)
 
-/*-------------------------------------------------------------------------
+/**-------------------------------------------------------------------------
 * 函数: comm_send
 * 说明: 发送
 * 参数: pData---数据buffer
@@ -1113,7 +1127,7 @@ public class DeviceControlActivity extends Activity {
 //        if(update_sendSize == 79968 || update_sendSize == 79968-112
 //                || update_sendSize == 45136-112 || update_sendSize == 45136
 //                || update_sendSize == 49168)
-        Boolean wait = (update_sendSize+112)/1024-(update_sendSize/1024)>0;
+        Boolean wait = (update_sendSize)/1024-(update_sendSize/1024-112)>0;
         if(wait)
         {
             //PrintLog.printHexString("当前数据为：", temp);
@@ -1124,7 +1138,7 @@ public class DeviceControlActivity extends Activity {
             }
         }else{
             try {
-                Thread.currentThread().sleep(30);
+                Thread.currentThread().sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -1310,16 +1324,17 @@ public class DeviceControlActivity extends Activity {
 
     private String[] province = new String[] { "上海", "北京", "海南" };
     // 单击事件对象的实例
-    private ButtonOnClick buttonOnClick = new ButtonOnClick(1);
+    private ButtonOnClick buttonOnClick;
     // 在单选选项中显示 确定和取消按钮
     //buttonOnClickg变量的数据类型是ButtonOnClick,一个单击事件类
     private void showSingleChoiceButton()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("请选择升级文件版本");
-        builder.setSingleChoiceItems(province, -1, buttonOnClick);
+        builder.setSingleChoiceItems(province,province.length-1, buttonOnClick);
         builder.setPositiveButton("确定", buttonOnClick);
         builder.setNegativeButton("取消", buttonOnClick);
+        builder.setCancelable(false);
         builder.show();
     }
 
@@ -1431,7 +1446,7 @@ public class DeviceControlActivity extends Activity {
         {
             province[j] = list.get(j).get("Name");
         }
-
+        buttonOnClick = new ButtonOnClick(province.length-1);
     }
 
     /**

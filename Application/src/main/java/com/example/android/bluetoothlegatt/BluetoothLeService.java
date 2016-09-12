@@ -29,6 +29,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -161,7 +162,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            Log.w("notif:","ok");
+            Log.w("notif:特征值变动","ok");
         }
 
         @Override
@@ -174,6 +175,15 @@ public class BluetoothLeService extends Service {
             }
         }
     };
+
+    public Boolean UpdateSpeed(){
+        Boolean flag = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            flag = mBluetoothGatt.requestConnectionPriority(1);//fast
+            Log.w("重设蓝牙速度","Setfast:"+String.valueOf(flag));
+        }
+        return flag;
+    }
 
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
