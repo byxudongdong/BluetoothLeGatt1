@@ -1,5 +1,9 @@
 [
     {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\menu\\global.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\menu\\global.xml"
+    },
+    {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\menu\\gatt_services.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\menu\\gatt_services.xml"
     },

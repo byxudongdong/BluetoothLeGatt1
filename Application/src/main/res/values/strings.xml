@@ -37,4 +37,49 @@
     <string name="bluetooth_scan_connect_w16">已配对的设备:</string>
     <string name="bluetooth_scan_noconnect_w16">暂无设备连接</string>
     <string name="bluetooth_scan_device">搜索设备</string>
+
+    <string name="alert_message_bonding_title">Bonding</string>
+    <string name="alert_message_bonding_message">Bonding is in process \nPlease wait..</string>
+    <string name="alert_message_connect_title">Device Connection</string>
+    <string name="alert_message_bluetooth_connect">The BLE device is connected</string>
+    <string name="alert_message_bluetooth_disconnect">The BLE device is disconnected</string>
+    <string name="alert_message_bluetooth_reconnect">Please Turn Bluetooth ON</string>
+    <string name="alert_message_reconnect">Your connection has been lost.</string>
+    <string name="alert_message_wait">Please wait..</string>
+    <!-- profile control elements -->
+    <string name="profile_control_unknown_service">Unknown Service</string>
+    <string name="profile_control_no_device_message">Pull down to refresh…</string>
+    <string name="profile_control_device_scanning">Refreshing, Please wait…</string>
+    <string name="profile_cannot_connect_message">Cannot connect to the device</string>
+    <string name="profile_control_stop_notification_toast">Notifications disabled</string>
+    <string name="profile_control_stop_indication_toast">Indications disabled</string>
+    <string name="profile_control_stop_both_notify_indicate_toast">All indications and notifications disabled</string>
+    <string name="enable_notify_failed">Failed to enable notification(s).
+        If you see this error repeatedly, disconnect and connect back to the device.</string>
+    <!-- Device discovery elements -->
+    <string name="device_unknown">Unknown device</string>
+    <string name="device_ble_not_supported">Bluetooth Low Energy not supported on device</string>
+    <string name="device_bluetooth_on">Bluetooth turned on successfully</string>
+    <string name="device_bluetooth_not_supported">Bluetooth not supported on device</string>
+    <string name="device_signal_strength">RSSI:</string>
+    <string name="device_signal_strength_unit">dBm</string>
+    <string name="alert_message_connect">Connecting to the device</string>
+    <string name="profile_scan_fragment">BLE Devices</string>
+    <string name="bluetooth_pair">Paired</string>
+    <string name="bluetooth_unpair">Not Paired</string>
+
+    <string name="graph">Graph</string>
+    <string name="log">Log</string>
+    <string name="share">Share</string>
+    <string name="search_title">Search Devices</string>
+    <string name="cache">Clear cache on disconnect</string>
+    <string name="alert_message_service_undiscovered">No services found</string>
+    <string name="progress_tile_service_discovering">Service Discovery</string>
+    <string name="progress_message_service_discovering">Discovering services. Please wait.</string>
+    <string name="progress_message_reconnect"> Reconnecting to device. Please wait.</string>
+    <string name="profile_control_fragment">Services</string>
+    <string name="exchange_mtu">"Exchange GATT MTU"</string>
+    <string name="exchange_mtu_request">"[%1$s | %2$s] %3$s request, MTU: %4$d, Status: %5$d"</string>
+    <string name="exchange_mtu_rsp">"[%1$s | %2$s] %3$s request completed, MTU: %4$d, Status: %5$d"</string>
+
 </resources>

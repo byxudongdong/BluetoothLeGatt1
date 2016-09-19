@@ -1,5 +1,9 @@
 [
     {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\device.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\device.xml"
+    },
+    {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\listitemchild_device.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\listitemchild_device.xml"
     },
@@ -8,12 +12,24 @@
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\actionbar_indeterminate_progress.xml"
     },
     {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\fragment_profile_scan.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\fragment_profile_scan.xml"
+    },
+    {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\listitem_device.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\listitem_device.xml"
     },
     {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\servicediscovery_temp_fragment.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\servicediscovery_temp_fragment.xml"
+    },
+    {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\bluetooth_search_activity.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\bluetooth_search_activity.xml"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\activity_main.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\activity_main.xml"
     },
     {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\listitemidex_device.xml",
@@ -22,6 +38,10 @@
     {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\bluetooth_scan_activity.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\bluetooth_scan_activity.xml"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\layout_search.xml",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\layout\\layout_search.xml"
     },
     {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\layout\\gatt_services_characteristics.xml",

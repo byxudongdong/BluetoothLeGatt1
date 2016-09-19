@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,8 +41,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -106,6 +111,7 @@ public class DeviceScanActivity extends ListActivity {
 //                startActivity(intent);
 //            }
 //        }
+        mDevRssiValues = new HashMap<String, Integer>();
     }
 
     @Override
@@ -204,6 +210,8 @@ public class DeviceScanActivity extends ListActivity {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Collections.sort(mLeDevices, new ComparatorValues());
+                    sendMessage(0);
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     invalidateOptionsMenu();
@@ -215,13 +223,37 @@ public class DeviceScanActivity extends ListActivity {
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
         }
         invalidateOptionsMenu();
     }
 
+    public final class ComparatorValues implements Comparator<BluetoothDevice> {
+
+        @Override
+        public int compare(BluetoothDevice object1, BluetoothDevice object2) {
+            int m1=mDevRssiValues.get( object1.getAddress() );
+            int m2=mDevRssiValues.get( object2.getAddress() );
+            int result=0;
+            if(m1>m2)
+            {
+                result=-1;
+            }
+            if(m1<m2)
+            {
+                result=1;
+            }
+            return result;
+        }
+
+    }
+
+    private Map<String, Integer> mDevRssiValues;
+
+    private ArrayList<BluetoothDevice> mLeDevices;
     // Adapter for holding devices found through scanning.
     private class LeDeviceListAdapter extends BaseAdapter {
-        private ArrayList<BluetoothDevice> mLeDevices;
+
         private LayoutInflater mInflator;
 
         public LeDeviceListAdapter() {
@@ -264,7 +296,7 @@ public class DeviceScanActivity extends ListActivity {
             ViewHolder viewHolder;
             // General ListView optimization code.
             if (view == null) {
-                view = mInflator.inflate(R.layout.listitem_device, null);
+                view = mInflator.inflate(R.layout.device, null);
                 viewHolder = new ViewHolder();
                 viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
                 viewHolder.deviceName = (TextView) view.findViewById(R.id.device_name);
@@ -280,8 +312,11 @@ public class DeviceScanActivity extends ListActivity {
                 viewHolder.deviceName.setText(deviceName);
             else
                 viewHolder.deviceName.setText(R.string.unknown_device);
+
                 viewHolder.deviceAddress.setText(device.getAddress());
-                //viewHolder.deviceDb.setText(device.EXTRA_RSSI);
+                String newRSSI = String.valueOf(mDevRssiValues.get(device.getAddress()) );
+                if(newRSSI != null)
+                viewHolder.deviceDb.setText(newRSSI);
 
             return view;
         }
@@ -292,13 +327,22 @@ public class DeviceScanActivity extends ListActivity {
             new BluetoothAdapter.LeScanCallback() {
 
         @Override
-        public void onLeScan(final BluetoothDevice device, int rssi, final byte[] scanRecord) {
+        public void onLeScan(final BluetoothDevice device,final int rssi, final byte[] scanRecord) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     //PrintLog.printHexString("扫描数据:",scanRecord);
                     //System.out.println(Arrays.toString(scanRecord));
-                    mLeDeviceListAdapter.addDevice(device);
+                    if(rssi>-70 && scanRecord[11] ==(byte)0xF0 && scanRecord[12] ==(byte)0xFF
+                                && (scanRecord[13] ==(byte)0x07 || scanRecord[13] ==(byte)0x0E) ) {
+                        mLeDeviceListAdapter.addDevice(device);
+
+                        if (mDevRssiValues.get(device.getAddress()) != null) {
+                            mDevRssiValues.put(device.getAddress(), (mDevRssiValues.get(device.getAddress()) + rssi) / 2);
+                        } else {
+                            mDevRssiValues.put(device.getAddress(), rssi);
+                        }
+                    }
                     mLeDeviceListAdapter.notifyDataSetChanged();
                 }
             });
@@ -310,4 +354,26 @@ public class DeviceScanActivity extends ListActivity {
         TextView deviceAddress;
         TextView deviceDb;
     }
+
+
+    public void sendMessage(int what)
+    {
+        Message message = new Message();
+        message.what = what;
+        handler.sendMessage(message);
+    }
+
+    final Handler handler=new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            switch (msg.what) {
+                case 0:
+                    mLeDeviceListAdapter.notifyDataSetChanged();
+                    //Toast.makeText(getApplicationContext(), "升级成功！！！", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 }

@@ -28,10 +28,13 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.filterdevice.Logger;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,13 +48,14 @@ public class BluetoothLeService extends Service {
 
     private BluetoothManager mBluetoothManager;
     private static BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
+    private static String mBluetoothDeviceAddress;
     private static BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
 
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
+    public static final int STATE_DISCONNECTED = 0;
+    public static final int STATE_CONNECTING = 1;
+    public static final int STATE_CONNECTED = 2;
+    public static final int STATE_DISCONNECTING = 4;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -66,6 +70,9 @@ public class BluetoothLeService extends Service {
 
     public final static String WRITE_STATUS =
             "com.example.bluetooth.le.WRITE_STATUS";
+
+    public final static String ACTION_GATT_SERVICE_DISCOVERY_UNSUCCESSFUL =
+            "com.example.bluetooth.le.ACTION_GATT_SERVICE_DISCOVERY_UNSUCCESSFUL";
 
     public final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
@@ -279,6 +286,13 @@ public class BluetoothLeService extends Service {
         return true;
     }
 
+    public int getConnectionState() {
+        synchronized (mGattCallback ) {
+            return mConnectionState;
+        }
+    }
+
+    BluetoothDevice device;
     /**
      * Connects to the GATT server hosted on the Bluetooth LE device.
      *
@@ -307,7 +321,7 @@ public class BluetoothLeService extends Service {
             }
         }
 
-        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        device = mBluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
@@ -322,6 +336,27 @@ public class BluetoothLeService extends Service {
     }
 
     /**
+     * Reconnect method to connect to already connected device
+     */
+    public void reconnect() {
+        Logger.e("<--Reconnecting device-->");
+        BluetoothDevice device = mBluetoothAdapter
+                .getRemoteDevice(mBluetoothDeviceAddress);
+        if (device == null) {
+            return;
+        }
+        mBluetoothGatt = null;//Creating a new instance of GATT before connect
+        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+        /**
+         * Adding data to the data logger
+         */
+        String dataLog = this.getResources().getString(R.string.dl_commaseparator)
+                + "[" + device.getName() + "|" + mBluetoothDeviceAddress + "] " +
+                this.getResources().getString(R.string.dl_connection_request);
+        Logger.datalog(dataLog);
+    }
+
+    /**
      * Disconnects an existing connection or cancel a pending connection. The disconnection result
      * is reported asynchronously through the
      * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
@@ -333,6 +368,20 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.disconnect();
+    }
+
+    public void discoverServices() {
+        // Logger.datalog(mContext.getResources().getString(R.string.dl_service_discover_request));
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            return;
+        } else {
+            mBluetoothGatt.discoverServices();
+            String dataLog = this.getResources().getString(R.string.dl_commaseparator)
+                    + "[" + device.getName() + "|" + mBluetoothDeviceAddress + "] " +
+                    this.getResources().getString(R.string.dl_service_discovery_request);
+            Logger.datalog(dataLog);
+        }
+
     }
 
     /**
@@ -414,9 +463,26 @@ public class BluetoothLeService extends Service {
         return mBluetoothGatt.getService(uuid);
     }
 
-    public void changeMtu(int mtu)
-    {
-        //mBluetoothGatt.configureMTU(128);
-        //BluetoothGatt.requestMtu(128);
+    public void exchangeGattMtu(int mtu) {
+
+        int retry = 5;
+        boolean status = false;
+        while (!status && retry > 0) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                status = mBluetoothGatt.requestMtu(mtu);
+            }
+            retry--;
+        }
+
+        Resources res = this.getResources();
+        String dataLog = String.format(
+                res.getString(R.string.exchange_mtu_request),
+                device.getName(),
+                mBluetoothDeviceAddress,
+                res.getString(R.string.exchange_mtu),
+                mtu,
+                status ? 0x00 : 0x01);
+
+        Logger.datalog(dataLog);
     }
 }

@@ -1,10 +1,386 @@
 [
     {
-        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\ic_launcher.png",
-        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\ic_launcher.png"
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\list_bg.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\list_bg.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\heart_rate.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\heart_rate.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\accelometer.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\accelometer.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\unknown.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\unknown.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\sensor_hub.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\sensor_hub.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\view_trackpad_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\view_trackpad_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\ic_more_vert_white_24dp.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\ic_more_vert_white_24dp.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\find_me.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\find_me.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\right_menu_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\right_menu_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\off_btn.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\off_btn.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\heart.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\heart.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\left_menu_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\left_menu_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\speed.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\speed.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\splash_bg.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\splash_bg.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\back_btn.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\back_btn.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\temp.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\temp.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\about.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\about.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\on_btn.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\on_btn.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\cadence.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\cadence.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\back_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\back_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\gamut.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\gamut.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\capsense_slider.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\capsense_slider.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\minus_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\minus_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\record_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\record_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\hand_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\hand_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\appicon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\appicon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\graph.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\graph.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\flame.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\flame.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\minus_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\minus_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\blutooth_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\blutooth_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\hand_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\hand_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\back_btn_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\back_btn_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\mobile.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\mobile.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\exit_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\exit_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\emulator.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\emulator.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\list_bg_small.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\list_bg_small.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\gray_transparent.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\gray_transparent.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\col_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\col_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\exit_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\exit_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\products.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\products.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\drawer_shadow.9.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\drawer_shadow.9.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\logo.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\logo.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\graph_right.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\graph_right.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\rgb_led.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\rgb_led.png"
     },
     {
         "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\draw_button.xml",
         "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\draw_button.xml"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\capsense_proimity.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\capsense_proimity.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\rgb_img.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\rgb_img.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\capsense_btn_bg.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\capsense_btn_bg.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\bledevices.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\bledevices.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\info_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\info_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\battery_small.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\battery_small.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\pressure.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\pressure.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\ic_launcher.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\search_white_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\search_white_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\glucose_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\glucose_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\glucose.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\glucose.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\slider.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\slider.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\run.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\run.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\blood_pressure_image.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\blood_pressure_image.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\qube.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\qube.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\arrow_bw.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\arrow_bw.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\hand_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\hand_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\rsc.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\rsc.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\battery_blank.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\battery_blank.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\back_btn_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\back_btn_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\proximity_bar.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\proximity_bar.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\document_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\document_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\right_menu_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\right_menu_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\plus_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\plus_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\battery.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\battery.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\share.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\share.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\view_trackpad_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\view_trackpad_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\device_info.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\device_info.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\find_me_blue_circle.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\find_me_blue_circle.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\capsense_buttons.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\capsense_buttons.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\blood_pressure.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\blood_pressure.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\cycle.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\cycle.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\white_circle2.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\white_circle2.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\batter_result.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\batter_result.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\gatt_db_dark_blue.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\gatt_db_dark_blue.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\plus_active.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\plus_active.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\cypress.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\cypress.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\capsense.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\capsense.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\thermometer_carousel.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\thermometer_carousel.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\banner_logo.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\banner_logo.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\themometer.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\themometer.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\brightness_icon.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\brightness_icon.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\green_color_btn.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\green_color_btn.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\record_down.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\record_down.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\logo_about.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\logo_about.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\delete_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\delete_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\home.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\home.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\proximity.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\proximity.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\left_menu_normal.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\left_menu_normal.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\cpc.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\cpc.png"
+    },
+    {
+        "merged": "H:\\ProJ\\BluetoothLeGatt1\\Application\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4\\contact.png",
+        "source": "H:\\ProJ\\BluetoothLeGatt1\\Application\\src\\main\\res\\drawable-xxhdpi\\contact.png"
     }
 ]
